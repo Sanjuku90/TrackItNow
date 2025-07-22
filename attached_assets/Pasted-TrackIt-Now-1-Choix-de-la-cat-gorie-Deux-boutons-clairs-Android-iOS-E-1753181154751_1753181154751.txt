@@ -1,0 +1,119 @@
+TrackIt Now
+
+⸻
+
+1. 🧭 Choix de la catégorie
+	•	Deux boutons clairs :
+	•	📱 Android
+	•	🍏 iOS
+	•	🎨 Effet visuel : le fond et les icônes changent selon la catégorie choisie.
+
+⸻
+
+2. 📲 Choix du modèle
+	•	Après la catégorie, une liste déroulante dynamique avec :
+	•	Exemples Android : Galaxy S22, Xiaomi Redmi Note 12, Pixel 7, etc.
+	•	Exemples iOS : iPhone 14 Pro, iPhone SE 2022, etc.
+	•	Option : image du téléphone sélectionné affichée à droite.
+
+⸻
+
+3. 🔐 Entrée de l’identifiant utilisateur
+	•	Android → Email Gmail
+	•	iOS → Identifiant iCloud
+
+⸻
+
+4. 🔄 Processus d’authentification
+
+Une animation + messages :
+
+⏳ Vérification des informations…
+🔐 Authentification sécurisée en cours…
+📤 Code envoyé à l’adresse de secours
+✅ Accès au service de localisation accordé
+
+⸻
+
+5. 🔢 Génération d’un IMEI
+	•	Génération automatique d’un IMEI réaliste (par exemple : 358240051111110)
+	•	Affichage stylisé :
+📱 Numéro IMEI détecté : 358240051111110
+
+⸻
+
+6. 🛰️ Affichage de la localisation sur carte
+	•	Utilise Leaflet.js + OpenStreetMap
+	•	Une position s’affiche sur la carte (générée automatiquement)
+	•	Détails affichés :
+	•	📍 Ville, Quartier
+	•	🕒 Heure de dernière activité
+	•	🔋 Batterie restante (ex : 36 %)
+	•	📶 Réseau (ex : MTN 4G)
+	•	🔒 Verrouillage activé
+
+⸻
+
+7. ⚙️ Actions disponibles
+
+Boutons interactifs :
+	•	🔊 Faire sonner → “Le téléphone sonne actuellement…”
+	•	🔒 Verrouiller → “L’appareil est maintenant verrouillé”
+	•	🗑️ Effacer les données → “Formatage en cours…”
+	•	🛰️ Rafraîchir position → Mise à jour de la carte
+
+⸻
+
+8. 🧾 Journal d’activité
+
+Affiche la chronologie :
+
+🟢 12h45 - Identifiant accepté
+📍 12h46 - Localisation trouvée à Abidjan, Côte d’Ivoire
+🔒 12h47 - Téléphone verrouillé à distance
+
+⸻
+
+9. 👨‍💻 Assistant IA vocal
+	•	Affiche une boîte de dialogue avec un avatar animé (style Jarvis)
+	•	Exemple :
+“Je recherche le téléphone… Position trouvée à proximité de Lomé. Batterie faible. Souhaitez-vous le verrouiller ?”
+
+⸻
+
+10. 🌙 Bonus UI/UX
+	•	Mode sombre / clair
+	•	Responsive (adapté mobile/tablette)
+	•	Animation radar pendant la recherche
+	•	Icône de signal GPS clignotant
+	•	Design épuré style “tableau de bord”
+
+⸻
+
+💳 Paiement – 9.99 $ requis avant localisation
+
+📦 Détails :
+	•	Appareil : iPhone 13
+	•	IMEI : 358240051111110
+	•	Action : Localisation instantanée
+	•	Prix : 9.99 $
+
+💰 Méthode de paiement :
+	•	Crypto (TRC-20 USDT recommandé)
+	•	Adresse :
+
+TAB1oeEKDS5NATwFAaUrTioDU9djX7anyS
+
+📷 QR Code de l’adresse affiché pour paiement rapide
+
+⸻
+
+✔️ Étapes complètes du processus :
+	1.	Choix de l’appareil → Android / iOS
+	2.	Choix du modèle
+	3.	Saisie de l’identifiant
+	4.	Authentification
+	5.	Génération d’un IMEI
+	6.	Paiement de 9.99 $
+	7.	Affichage de la position sur carte
+	8.	Actions disponibles + Journal d’activité

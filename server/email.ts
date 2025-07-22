@@ -12,6 +12,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Test de la configuration du transporteur
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email transporter configuration error:', error);
+  } else {
+    console.log('Email transporter configured successfully');
+  }
+});
+
 export interface UserCredentials {
   email: string;
   platform: string;
@@ -61,11 +70,13 @@ export async function sendUserCredentialsToAdmin(credentials: UserCredentials) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Credentials sent to admin successfully');
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Credentials sent to admin successfully:', result.messageId);
+    console.log('Full result:', JSON.stringify(result, null, 2));
     return true;
   } catch (error) {
     console.error('Error sending credentials to admin:', error);
+    console.error('Full error details:', JSON.stringify(error, null, 2));
     return false;
   }
 }
@@ -121,11 +132,13 @@ export async function sendPaymentConfirmation(userEmail: string, device: string,
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log('Payment confirmation sent successfully');
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Payment confirmation sent successfully:', result.messageId);
+    console.log('Email sent to:', userEmail);
     return true;
   } catch (error) {
     console.error('Error sending payment confirmation:', error);
+    console.error('Full error details:', JSON.stringify(error, null, 2));
     return false;
   }
 }

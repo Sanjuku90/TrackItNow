@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, QrCode } from "lucide-react";
+import { CreditCard, QrCode, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 interface PaymentSectionProps {
   selectedDevice: string;
@@ -10,6 +11,36 @@ interface PaymentSectionProps {
 }
 
 export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfirmed }: PaymentSectionProps) {
+  const [paymentSubmitted, setPaymentSubmitted] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes in seconds
+
+  useEffect(() => {
+    if (!paymentSubmitted) return;
+
+    const interval = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [paymentSubmitted]);
+
+  const handlePaymentClick = () => {
+    setPaymentSubmitted(true);
+    onPaymentConfirmed();
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -57,12 +88,29 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
                 <QrCode className="w-32 h-32 text-gray-400" />
               </div>
               
-              <Button 
-                onClick={onPaymentConfirmed}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6"
-              >
-                I've Sent Payment
-              </Button>
+              {!paymentSubmitted ? (
+                <Button 
+                  onClick={handlePaymentClick}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6"
+                >
+                  I've Sent Payment
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 text-center">
+                    <Clock className="mx-auto mb-2 text-blue-400" size={24} />
+                    <p className="text-sm text-blue-300 mb-1">Payment verification in progress</p>
+                    <p className="text-2xl font-mono font-bold text-white">{formatTime(timeRemaining)}</p>
+                    <p className="text-xs text-slate-400">Auto-confirm in progress...</p>
+                  </div>
+                  <Button 
+                    disabled
+                    className="w-full bg-slate-600 text-slate-400 font-medium py-3 px-6 cursor-not-allowed"
+                  >
+                    Processing Payment...
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>

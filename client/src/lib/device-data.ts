@@ -32,12 +32,19 @@ export interface DeviceInfo {
   };
 }
 
+// Lomé coordinates range: Latitude 6.10-6.18, Longitude 1.20-1.25
+export const generateLomeLocation = () => {
+  const lat = 6.10 + Math.random() * 0.08; // Random between 6.10 and 6.18
+  const lng = 1.20 + Math.random() * 0.05; // Random between 1.20 and 1.25
+  return [lat, lng] as [number, number];
+};
+
 export const mockDeviceInfo: DeviceInfo = {
   battery: '36%',
   network: 'MTN 4G',
   lockStatus: 'Locked',
   location: {
-    city: 'Abidjan, CI',
-    coordinates: [5.36, -4.01]
+    city: 'Lomé, TG',
+    coordinates: generateLomeLocation()
   }
 };

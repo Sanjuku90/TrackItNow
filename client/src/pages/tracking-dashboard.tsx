@@ -83,9 +83,10 @@ export default function TrackingDashboard() {
   const handlePaymentConfirmed = () => {
     toast({
       title: "Payment Processing",
-      description: "Payment verification in progress...",
+      description: "Payment verification in progress. Please wait 3 minutes...",
     });
     
+    // Auto-confirm payment after 3 minutes (180 seconds)
     setTimeout(() => {
       toast({
         title: "Payment Confirmed",
@@ -95,7 +96,7 @@ export default function TrackingDashboard() {
       setTimeout(() => {
         setCurrentStep('dashboard');
       }, 2000);
-    }, 3000);
+    }, 180000); // 3 minutes = 180,000 milliseconds
   };
 
   return (

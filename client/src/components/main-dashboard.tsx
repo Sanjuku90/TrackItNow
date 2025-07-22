@@ -14,7 +14,7 @@ import {
   Signal,
   LockKeyhole
 } from "lucide-react";
-import { mockDeviceInfo } from "@/lib/device-data";
+import { mockDeviceInfo, generateLomeLocation } from "@/lib/device-data";
 import { ActivityEntry, createActivityEntry } from "@/lib/tracking-utils";
 
 interface MainDashboardProps {
@@ -23,9 +23,10 @@ interface MainDashboardProps {
 
 export function MainDashboard({ isVisible }: MainDashboardProps) {
   const mapRef = useRef<HTMLDivElement>(null);
+  const [currentLocation, setCurrentLocation] = useState(generateLomeLocation());
   const [activities, setActivities] = useState<ActivityEntry[]>([
     createActivityEntry('Identifier accepted', 'success'),
-    createActivityEntry('Location found - Abidjan, Côte d\'Ivoire', 'info'),
+    createActivityEntry('Location found - Lomé, Togo', 'info'),
     createActivityEntry('Device locked remotely', 'warning')
   ]);
 
@@ -51,7 +52,9 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   };
 
   const refreshLocation = () => {
-    addActivity('Location refreshed', 'info');
+    const newLocation = generateLomeLocation();
+    setCurrentLocation(newLocation);
+    addActivity('Location refreshed - Lomé, Togo', 'info');
   };
 
   useEffect(() => {
@@ -61,7 +64,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     const L = (window as any).L;
     if (!L) return;
 
-    const map = L.map(mapRef.current).setView(mockDeviceInfo.location.coordinates, 13);
+    const map = L.map(mapRef.current).setView(currentLocation, 13);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -74,7 +77,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
       className: 'device-marker'
     });
 
-    L.marker(mockDeviceInfo.location.coordinates, { icon: deviceIcon })
+    L.marker(currentLocation, { icon: deviceIcon })
       .addTo(map)
       .bindPopup(`Device Location<br>Battery: ${mockDeviceInfo.battery}<br>Last seen: 2 minutes ago`)
       .openPopup();
@@ -82,7 +85,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     return () => {
       map.remove();
     };
-  }, [isVisible]);
+  }, [isVisible, currentLocation]);
 
   if (!isVisible) return null;
 
@@ -118,7 +121,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                 <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                   <MapPin className="text-emerald-400 mb-1 mx-auto" size={16} />
                   <p className="text-xs text-slate-400">Location</p>
-                  <p className="font-semibold">{mockDeviceInfo.location.city}</p>
+                  <p className="font-semibold">Lomé, TG</p>
                 </div>
                 <div className="bg-slate-700/50 rounded-lg p-3 text-center">
                   <Battery className="text-amber-400 mb-1 mx-auto" size={16} />
@@ -225,7 +228,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             </div>
             <div className="flex-1 bg-slate-700/50 rounded-lg p-4">
               <p className="text-sm">
-                "I'm searching for the phone... Position found near {mockDeviceInfo.location.city}. 
+                "I'm searching for the phone... Position found near Lomé, Togo. 
                 Battery is low at {mockDeviceInfo.battery}. The device is currently {mockDeviceInfo.lockStatus.toLowerCase()}. 
                 Would you like me to make it ring?"
               </p>

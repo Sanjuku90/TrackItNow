@@ -12,7 +12,7 @@ interface PaymentSectionProps {
 
 export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfirmed }: PaymentSectionProps) {
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes in seconds
+  const [timeRemaining, setTimeRemaining] = useState(60); // 1 minute in seconds
 
   useEffect(() => {
     if (!paymentSubmitted) return;

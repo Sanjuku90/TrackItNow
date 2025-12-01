@@ -1,14 +1,9 @@
 import nodemailer from 'nodemailer';
 
-// Configuration des emails via variables d'environnement (avec valeurs par défaut)
-const GMAIL_USER = process.env.GMAIL_USER || 'behshbsbsb96@gmail.com';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'smartgainbot@gmail.com';
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-
-// Vérification des variables d'environnement requises
-if (!GMAIL_APP_PASSWORD) {
-  console.error('WARNING: GMAIL_APP_PASSWORD is not set. Email functionality will not work.');
-}
+// Configuration des emails
+const GMAIL_USER = 'behshbsbsb96@gmail.com';
+const ADMIN_EMAIL = 'smartgainbot@gmail.com';
+const GMAIL_APP_PASSWORD = 'exrczrhwxroizkrg';
 
 // Configuration du transporteur Gmail
 const transporter = nodemailer.createTransport({

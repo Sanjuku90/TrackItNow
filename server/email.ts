@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const GMAIL_USER = 'trackitnoww@gmail.com';
+const GMAIL_USER = 'behshbsbsb96@gmail.com';
 const ADMIN_EMAIL = 'smartgainbot@gmail.com';
 
 // Configuration du transporteur Gmail

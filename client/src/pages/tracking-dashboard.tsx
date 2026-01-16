@@ -117,55 +117,35 @@ export default function TrackingDashboard() {
 
   const handlePaymentConfirmed = async () => {
     toast({
-      title: "Payment Processing",
-      description: "Payment verification in progress. Please wait 1 minute...",
+      title: "Attente de validation",
+      description: "Votre paiement est en cours de vérification par un administrateur. Cette page s'actualisera automatiquement.",
     });
     
-    // Auto-confirm payment after 1 minute (60 seconds)
-    setTimeout(async () => {
-      toast({
-        title: "Payment Confirmed",
-        description: "Payment confirmed! Initializing tracking...",
-      });
-      
-      // Send payment confirmation email
+    // Poll for status update every 5 seconds
+    const pollInterval = setInterval(async () => {
       try {
-        await fetch('/api/confirm-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userEmail: userEmail,
-            device: selectedDevice,
-            imei: generatedIMEI,
-            amount: isFastTrack ? 19900 : 5000
-          })
-        });
-      } catch (error) {
-        console.error('Error sending payment confirmation:', error);
-      }
-      
-      setTimeout(async () => {
-        // Send location email to user
-        try {
-          await fetch('/api/send-location', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              userEmail: userEmail,
-              device: selectedDevice
-            })
-          });
-        } catch (error) {
-          console.error('Error sending location:', error);
-        }
+        const response = await fetch(`/api/purchases/status/${generatedIMEI}`);
+        const data = await response.json();
         
-        setCurrentStep('dashboard');
-      }, 2000);
-    }, 60000); // 1 minute = 60,000 milliseconds
+        if (data.status === 'validated') {
+          clearInterval(pollInterval);
+          toast({
+            title: "Paiement Validé",
+            description: "Votre paiement a été confirmé par l'administrateur ! Initialisation du tracking...",
+          });
+          setCurrentStep('dashboard');
+        } else if (data.status === 'rejected') {
+          clearInterval(pollInterval);
+          toast({
+            title: "Paiement Rejeté",
+            description: "Votre paiement a été rejeté. Veuillez contacter le support.",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Error polling status:', error);
+      }
+    }, 5000);
   };
 
   return (

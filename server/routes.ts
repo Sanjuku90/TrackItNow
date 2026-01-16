@@ -22,6 +22,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(purchases);
   });
 
+  // Get purchase status by IMEI
+  app.get('/api/purchases/status/:imei', async (req, res) => {
+    const purchases = await storage.getPurchases();
+    const purchase = purchases.find(p => p.imei === req.params.imei);
+    if (!purchase) return res.status(404).json({ error: 'Purchase not found' });
+    res.json({ status: purchase.status });
+  });
+
   // Admin: Validate purchase
   app.patch('/api/admin/purchases/:id', async (req, res) => {
     const id = parseInt(req.params.id);
@@ -32,6 +40,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     if (status === 'validated') {
       await sendPaymentConfirmation(userEmail, device, imei, amount);
+      // Automatically send location after validation
+      const coordinates = generateLomeLocation();
+      await sendLocationToUser(userEmail, device, coordinates);
     }
 
     res.json(updated);

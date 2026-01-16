@@ -196,11 +196,18 @@ export default function Home() {
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of satisfied customers who trust TrackIt Now for professional device recovery
           </p>
-          <Link href="/tracking">
-            <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold">
-              Start Tracking - Only $9.99
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Link href="/tracking">
+              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold w-full sm:w-auto">
+                Standard Tracking - $9.99
+              </Button>
+            </Link>
+            <Link href="/tracking?fast=true">
+              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto">
+                Fast Track Priority - $32.90
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 

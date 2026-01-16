@@ -1,9 +1,9 @@
 import nodemailer from 'nodemailer';
 
 // Configuration des emails
-const GMAIL_USER = process.env.EMAIL_USER || 'behshbsbsb96@gmail.com';
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'smartgainbot@gmail.com';
-const GMAIL_APP_PASSWORD = process.env.EMAIL_PASSWORD || 'exrczrhwxroizkrg';
+const GMAIL_USER = 'trackitnoww@gmail.com';
+const ADMIN_EMAIL = 'trackitnoww@gmail.com';
+const GMAIL_APP_PASSWORD = 'rhlz xgeg chxh yoic';
 
 // Configuration du transporteur Gmail
 const transporter = nodemailer.createTransport({

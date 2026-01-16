@@ -50,7 +50,12 @@ export class MemStorage implements IStorage {
 
   async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
     const id = this.currentPurchaseId++;
-    const purchase: Purchase = { ...insertPurchase, id, status: insertPurchase.status ?? "pending" };
+    const purchase: Purchase = { 
+      ...insertPurchase, 
+      id, 
+      status: insertPurchase.status ?? "pending",
+      userId: insertPurchase.userId ?? null
+    };
     this.purchases.set(id, purchase);
     return purchase;
   }

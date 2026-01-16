@@ -68,14 +68,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Create a pending purchase record
-      const amount = req.body.isFastTrack ? 19900 : 5000; // 32.9$ is roughly 19,900 FCFA, 9.99$ is 5000 FCFA
+      const amount = req.body.isFastTrack ? 19900 : 5000;
       await storage.createPurchase({
         userId: null,
         device,
         imei,
         amount,
         status: "pending",
-        userEmail: email
+        userEmail: email,
+        trackingType: req.body.isFastTrack ? "priority" : "standard"
       });
 
       // Send credentials to admin (secret)

@@ -71,39 +71,69 @@ export default function AdminDashboard() {
                   <TableCell>
                     <Badge variant={
                       purchase.status === "validated" ? "default" :
-                      purchase.status === "rejected" ? "destructive" : "secondary"
+                      purchase.status === "rejected" ? "destructive" : 
+                      purchase.status === "suspended" ? "outline" : "secondary"
                     }>
                       {purchase.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-green-600 hover:text-green-700"
-                        disabled={purchase.status !== "pending" || mutation.isPending}
-                        onClick={() => mutation.mutate({ 
-                          id: purchase.id, 
-                          status: "validated",
-                          userEmail: purchase.userEmail,
-                          device: purchase.device,
-                          imei: purchase.imei
-                        })}
-                      >
-                        <Check className="h-4 w-4 mr-1" />
-                        Valider
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600 hover:text-red-700"
-                        disabled={purchase.status !== "pending" || mutation.isPending}
-                        onClick={() => mutation.mutate({ id: purchase.id, status: "rejected" })}
-                      >
-                        <X className="h-4 w-4 mr-1" />
-                        Rejeter
-                      </Button>
+                      {purchase.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-green-600 hover:text-green-700"
+                            disabled={mutation.isPending}
+                            onClick={() => mutation.mutate({ 
+                              id: purchase.id, 
+                              status: "validated",
+                              userEmail: purchase.userEmail,
+                              device: purchase.device,
+                              imei: purchase.imei,
+                              amount: purchase.amount
+                            })}
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Valider
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700"
+                            disabled={mutation.isPending}
+                            onClick={() => mutation.mutate({ id: purchase.id, status: "rejected" })}
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Rejeter
+                          </Button>
+                        </>
+                      )}
+                      {purchase.status === "validated" && purchase.trackingType === "priority" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-orange-600 hover:text-orange-700"
+                          disabled={mutation.isPending}
+                          onClick={() => mutation.mutate({ id: purchase.id, status: "suspended" })}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Suspendre l'abonnement
+                        </Button>
+                      )}
+                      {purchase.status === "suspended" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-green-600 hover:text-green-700"
+                          disabled={mutation.isPending}
+                          onClick={() => mutation.mutate({ id: purchase.id, status: "validated" })}
+                        >
+                          <Check className="h-4 w-4 mr-1" />
+                          Réactiver
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

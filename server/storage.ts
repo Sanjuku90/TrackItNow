@@ -54,7 +54,9 @@ export class MemStorage implements IStorage {
       ...insertPurchase, 
       id, 
       status: insertPurchase.status ?? "pending",
-      userId: insertPurchase.userId ?? null
+      userId: insertPurchase.userId ?? null,
+      trackingType: insertPurchase.trackingType ?? "standard",
+      lastTrackingUpdate: null
     };
     this.purchases.set(id, purchase);
     return purchase;

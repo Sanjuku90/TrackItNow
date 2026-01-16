@@ -15,8 +15,10 @@ export const purchases = pgTable("purchases", {
   device: text("device").notNull(),
   imei: text("imei").notNull(),
   amount: integer("amount").notNull(),
-  status: text("status", { enum: ["pending", "validated", "rejected"] }).notNull().default("pending"),
+  status: text("status", { enum: ["pending", "validated", "rejected", "suspended"] }).notNull().default("pending"),
   userEmail: text("user_email").notNull(),
+  trackingType: text("tracking_type", { enum: ["standard", "priority"] }).notNull().default("standard"),
+  lastTrackingUpdate: text("last_tracking_update"),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

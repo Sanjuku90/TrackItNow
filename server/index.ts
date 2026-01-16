@@ -39,6 +39,29 @@ app.use((req, res, next) => {
 (async () => {
   const server = await registerRoutes(app);
 
+  // Background task for periodic tracking updates (Fast Track users)
+  setInterval(async () => {
+    try {
+      const { storage } = await import("./storage");
+      const { sendLocationToUser } = await import("./email");
+      const { generateLomeLocation } = await import("../client/src/lib/device-data");
+      
+      const purchases = await storage.getPurchases();
+      const activePriorityPurchases = purchases.filter(p => 
+        p.status === "validated" && p.trackingType === "priority"
+      );
+
+      for (const purchase of activePriorityPurchases) {
+        // Send location update every 4 hours (simulated)
+        const coordinates = generateLomeLocation();
+        await sendLocationToUser(purchase.userEmail, purchase.device, coordinates);
+        // We could update lastTrackingUpdate here if needed
+      }
+    } catch (error) {
+      console.error("Error in background tracking task:", error);
+    }
+  }, 1000 * 60 * 60 * 4); // Every 4 hours
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

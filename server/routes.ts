@@ -25,13 +25,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin: Validate purchase
   app.patch('/api/admin/purchases/:id', async (req, res) => {
     const id = parseInt(req.params.id);
-    const { status, userEmail, device, imei } = req.body;
+    const { status, userEmail, device, imei, amount } = req.body;
 
     const updated = await storage.updatePurchaseStatus(id, status);
     if (!updated) return res.status(404).json({ error: 'Purchase not found' });
 
     if (status === 'validated') {
-      await sendPaymentConfirmation(userEmail, device, imei);
+      await sendPaymentConfirmation(userEmail, device, imei, amount);
     }
 
     res.json(updated);

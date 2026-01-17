@@ -30,11 +30,30 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     createActivityEntry('Location found - Lomé, Togo', 'info'),
     createActivityEntry('Device locked remotely', 'warning')
   ]);
+  const [isPriority, setIsPriority] = useState(false);
 
   useEffect(() => {
-    if (!isVisible) return;
+    // Check if the current purchase is priority
+    const checkTrackingType = async () => {
+      try {
+        // We need the IMEI to check status, but it's not passed here. 
+        // For simulation, we'll check the URL or a global state if available.
+        // As a fallback, we'll look at the last purchase in session storage or similar.
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('fast') === 'true') {
+          setIsPriority(true);
+        }
+      } catch (e) {
+        console.error("Error checking tracking type", e);
+      }
+    };
+    checkTrackingType();
+  }, []);
 
-    // Simulate movement every 5 seconds
+  useEffect(() => {
+    if (!isVisible || !isPriority) return;
+
+    // Simulate movement every 5 seconds only for priority
     const moveInterval = setInterval(() => {
       setCurrentLocation(prev => {
         const newLat = prev[0] + direction[0];
@@ -48,7 +67,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     }, 5000);
 
     return () => clearInterval(moveInterval);
-  }, [isVisible, direction]);
+  }, [isVisible, isPriority, direction]);
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info') => {
     const newActivity = createActivityEntry(message, type);

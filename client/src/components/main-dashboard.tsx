@@ -102,14 +102,6 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                   <MapPin className="text-emerald-400 mr-3 animate-pulse" size={24} />
                   Live Location
                 </h2>
-                <Button 
-                  onClick={refreshLocation}
-                  size="sm"
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
-                >
-                  <RefreshCw className="mr-2" size={16} />
-                  Refresh
-                </Button>
               </div>
               
               <div 

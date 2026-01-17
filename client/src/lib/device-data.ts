@@ -231,10 +231,24 @@ export interface DeviceInfo {
   };
 }
 
-// Lomé coordinates range: Latitude 6.10-6.18, Longitude 1.20-1.25
+// Lomé coordinates for main roads/intersections
+const LOME_ROADS: [number, number][] = [
+  [6.1311, 1.2228], // Blvd du 13 Janvier
+  [6.1256, 1.2154], // Avenue de la Libération
+  [6.1458, 1.2345], // Route d'Aného
+  [6.1723, 1.2089], // Boulevard Gnassingbé Eyadéma
+  [6.1589, 1.2212], // Avenue de la Paix
+  [6.1287, 1.2367], // Avenue de la Marina
+  [6.1845, 1.2156], // Route de l'Aéroport
+  [6.1412, 1.2045]  // Boulevard de la Kara
+];
+
 export const generateLomeLocation = () => {
-  const lat = 6.10 + Math.random() * 0.08; // Random between 6.10 and 6.18
-  const lng = 1.20 + Math.random() * 0.05; // Random between 1.20 and 1.25
+  const randomIndex = Math.floor(Math.random() * LOME_ROADS.length);
+  const road = LOME_ROADS[randomIndex];
+  // Add a very small jitter to simulate being ON the road but not exact same point
+  const lat = road[0] + (Math.random() - 0.5) * 0.0005;
+  const lng = road[1] + (Math.random() - 0.5) * 0.0005;
   return [lat, lng] as [number, number];
 };
 

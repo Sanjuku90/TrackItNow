@@ -24,11 +24,31 @@ interface MainDashboardProps {
 export function MainDashboard({ isVisible }: MainDashboardProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [currentLocation, setCurrentLocation] = useState(generateLomeLocation());
+  const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); // Latitude change for ~100m north
   const [activities, setActivities] = useState<ActivityEntry[]>([
     createActivityEntry('Identifier accepted', 'success'),
     createActivityEntry('Location found - Lomé, Togo', 'info'),
     createActivityEntry('Device locked remotely', 'warning')
   ]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    // Simulate movement every 5 seconds
+    const moveInterval = setInterval(() => {
+      setCurrentLocation(prev => {
+        const newLat = prev[0] + direction[0];
+        const newLng = prev[1] + direction[1];
+        
+        // Add activity for movement
+        addActivity('Device moving - tracking update', 'info');
+        
+        return [newLat, newLng] as [number, number];
+      });
+    }, 5000);
+
+    return () => clearInterval(moveInterval);
+  }, [isVisible, direction]);
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info') => {
     const newActivity = createActivityEntry(message, type);

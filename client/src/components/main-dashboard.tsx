@@ -52,7 +52,8 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     }
     
     // Check for specific plans
-    if (params.get('plan') === 'family') {
+    const plan = params.get('plan');
+    if (plan === 'family') {
       setIsFamilyPlan(true);
       setGeofences([
         { name: "Maison", lat: currentLocation[0], lng: currentLocation[1], radius: 200 },
@@ -60,10 +61,21 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
       ]);
     }
     
-    if (params.get('plan') === 'temporary') {
+    if (plan === 'temporary') {
       setIsGhostLink(true);
     }
   }, []);
+
+  const generateGhostLink = () => {
+    const token = Math.random().toString(36).substring(2, 15);
+    const link = `${window.location.origin}/ghost/${token}`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "Ghost Link Generated",
+      description: "Secure sharing link copied to clipboard. Expires in 2 hours.",
+    });
+    addActivity('Ghost Link generated for secure sharing', 'success');
+  };
 
   useEffect(() => {
     if (!isVisible) return;
@@ -121,13 +133,15 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     const messages = {
       ring: 'Device is now ringing...',
       lock: 'Device has been locked remotely',
-      wipe: 'Data wipe initiated - This cannot be undone!'
+      wipe: 'Data wipe initiated - This cannot be undone!',
+      panic: 'MOD RE URGENCE: Tracking haute fréquence activé, micro/caméra ouverts'
     };
 
     const types: Record<string, ActivityEntry['type']> = {
       ring: 'info',
       lock: 'warning', 
-      wipe: 'error'
+      wipe: 'error',
+      panic: 'error'
     };
 
     addActivity(messages[action as keyof typeof messages], types[action]);
@@ -156,6 +170,16 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
 
     L.marker(currentLocation, { icon: deviceIcon })
       .addTo(map);
+
+    // System 3: Breadcrumbs - draw trail
+    if ((isFamilyPlan || isPriority) && breadcrumbTrail.length > 1) {
+      L.polyline(breadcrumbTrail, {
+        color: isPriority ? '#3b82f6' : '#10b981',
+        weight: 3,
+        opacity: 0.5,
+        dashArray: '5, 10'
+      }).addTo(map);
+    }
 
     if (isFamilyPlan) {
       geofences.forEach(gf => {
@@ -190,6 +214,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             <Badge className="bg-emerald-500/20 text-emerald-400 border-none px-3">Live Tracking</Badge>
             {isPriority && <Badge className="bg-primary/20 text-primary border-none px-3">Fast Track Priority</Badge>}
             {isFamilyPlan && <Badge className="bg-blue-500/20 text-blue-400 border-none px-3 flex items-center gap-1"><Users size={12}/> Family Circle</Badge>}
+            {isGhostLink && <Badge className="bg-purple-500/20 text-purple-400 border-none px-3 flex items-center gap-1"><Ghost size={12}/> Ghost Link Active</Badge>}
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Tracking Terminal</h2>
         </div>
@@ -276,6 +301,34 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             </h3>
             
             <div className="space-y-4">
+              {isFamilyPlan && (
+                <button
+                  onClick={() => executeAction('panic')}
+                  className="w-full group text-left p-4 rounded-3xl bg-red-500/10 border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/20 transition-all duration-300 flex items-center space-x-4 mb-2"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <ShieldAlert size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm truncate text-red-300">PANIC MODE</h4>
+                    <p className="text-xs text-red-400/60 truncate">Activez l'urgence maximale</p>
+                  </div>
+                </button>
+              )}
+              {isGhostLink && (
+                <button
+                  onClick={generateGhostLink}
+                  className="w-full group text-left p-4 rounded-3xl bg-purple-500/10 border border-purple-500/20 hover:border-purple-500/40 hover:bg-purple-500/20 transition-all duration-300 flex items-center space-x-4 mb-4"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
+                    <Share2 size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm truncate text-purple-300">Generate Ghost Link</h4>
+                    <p className="text-xs text-purple-400/60 truncate">Share secure temporary access</p>
+                  </div>
+                </button>
+              )}
               {[
                 { id: 'ring', name: 'Emergency Alarm', desc: 'Trigger maximum volume ring', icon: Volume2, color: 'emerald' },
                 { id: 'lock', name: 'Secure Lock', desc: 'Lock with custom message', icon: Lock, color: 'amber' },

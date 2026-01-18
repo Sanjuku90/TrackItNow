@@ -31,12 +31,26 @@ export const geofences = pgTable("geofences", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
+export const ghostLinks = pgTable("ghost_links", {
+  id: serial("id").primaryKey(),
+  purchaseId: integer("purchase_id").references(() => purchases.id),
+  token: text("token").notNull().unique(),
+  expiresAt: text("expires_at").notNull(),
+  isViewed: boolean("is_viewed").notNull().default(false),
+});
+
 export const insertGeofenceSchema = createInsertSchema(geofences).omit({
+  id: true,
+});
+
+export const insertGhostLinkSchema = createInsertSchema(ghostLinks).omit({
   id: true,
 });
 
 export type Geofence = typeof geofences.$inferSelect;
 export type InsertGeofence = z.infer<typeof insertGeofenceSchema>;
+export type GhostLink = typeof ghostLinks.$inferSelect;
+export type InsertGhostLink = z.infer<typeof insertGhostLinkSchema>;
 
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,

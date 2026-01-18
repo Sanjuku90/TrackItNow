@@ -1,4 +1,4 @@
-import { users, purchases, geofences, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence } from "@shared/schema";
+import { users, purchases, geofences, ghostLinks, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -18,23 +18,31 @@ export interface IStorage {
   getGeofences(purchaseId: number): Promise<Geofence[]>;
   createGeofence(geofence: InsertGeofence): Promise<Geofence>;
   deleteGeofence(id: number): Promise<boolean>;
+
+  // GhostLink methods
+  getGhostLinkByToken(token: string): Promise<GhostLink | undefined>;
+  createGhostLink(ghostLink: InsertGhostLink): Promise<GhostLink>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private purchases: Map<number, Purchase>;
   private geofences: Map<number, Geofence>;
+  private ghostLinks: Map<number, GhostLink>;
   currentUserId: number;
   currentPurchaseId: number;
   currentGeofenceId: number;
+  currentGhostLinkId: number;
 
   constructor() {
     this.users = new Map();
     this.purchases = new Map();
     this.geofences = new Map();
+    this.ghostLinks = new Map();
     this.currentUserId = 1;
     this.currentPurchaseId = 1;
     this.currentGeofenceId = 1;
+    this.currentGhostLinkId = 1;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -91,13 +99,34 @@ export class MemStorage implements IStorage {
 
   async createGeofence(insertGeofence: InsertGeofence): Promise<Geofence> {
     const id = this.currentGeofenceId++;
-    const geofence: Geofence = { ...insertGeofence, id };
+    const geofence: Geofence = { 
+      ...insertGeofence, 
+      id,
+      purchaseId: insertGeofence.purchaseId ?? null,
+      isActive: insertGeofence.isActive ?? true
+    };
     this.geofences.set(id, geofence);
     return geofence;
   }
 
   async deleteGeofence(id: number): Promise<boolean> {
     return this.geofences.delete(id);
+  }
+
+  async getGhostLinkByToken(token: string): Promise<GhostLink | undefined> {
+    return Array.from(this.ghostLinks.values()).find(l => l.token === token);
+  }
+
+  async createGhostLink(insertGhostLink: InsertGhostLink): Promise<GhostLink> {
+    const id = this.currentGhostLinkId++;
+    const ghostLink: GhostLink = { 
+      ...insertGhostLink, 
+      id,
+      purchaseId: insertGhostLink.purchaseId ?? null,
+      isViewed: insertGhostLink.isViewed ?? false
+    };
+    this.ghostLinks.set(id, ghostLink);
+    return ghostLink;
   }
 }
 

@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, QrCode, Clock, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { CreditCard, Clock, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface PaymentSectionProps {
@@ -139,11 +139,6 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
                 <div className="bg-slate-900 rounded p-3 font-mono text-sm break-all border">
                   TAB1oeEKDS5NATwFAaUrTioDU9djX7anyS
                 </div>
-              </div>
-              
-              <div className="bg-white rounded-lg p-4 flex justify-center mb-4 relative overflow-hidden group">
-                <QrCode className="w-32 h-32 text-gray-800" />
-                <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-transparent transition-colors"></div>
               </div>
               
               {!paymentSubmitted ? (

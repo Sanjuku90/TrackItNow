@@ -183,14 +183,15 @@ export default function TrackingDashboard() {
         <div className="relative w-full">
           {/* Progress Indicator */}
           <div className="mb-6 sm:mb-10 flex justify-between items-center max-w-xl mx-auto px-2 sm:px-4">
-            {['platform', 'device', 'identifier', 'dashboard'].map((step, i) => {
-              const isActive = currentStep === step || 
-                (step === 'platform' && currentStep !== 'platform') ||
-                (step === 'device' && !['platform', 'device'].includes(currentStep)) ||
-                (step === 'identifier' && ['auth', 'dashboard'].includes(currentStep));
+            {['platform', 'appareil', 'identifiant', 'tableau de bord'].map((step, i) => {
+              const stepKey = ['platform', 'device', 'identifier', 'dashboard'][i] as Step;
+              const isActive = currentStep === stepKey || 
+                (stepKey === 'platform' && currentStep !== 'platform') ||
+                (stepKey === 'device' && !['platform', 'device'].includes(currentStep)) ||
+                (stepKey === 'identifier' && ['auth', 'dashboard'].includes(currentStep));
               
               return (
-                <div key={step} className="flex flex-col items-center">
+                <div key={stepKey} className="flex flex-col items-center">
                   <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-primary border-primary shadow-lg shadow-primary/20' : 'border-white/10 bg-white/5 text-slate-500'}`}>
                     <span className="text-[10px] sm:text-xs font-bold">{i + 1}</span>
                   </div>

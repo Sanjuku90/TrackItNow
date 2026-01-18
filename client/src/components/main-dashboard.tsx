@@ -37,9 +37,9 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   const [currentLocation, setCurrentLocation] = useState(generateLomeLocation());
   const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); 
   const [activities, setActivities] = useState<ActivityEntry[]>([
-    createActivityEntry('Identifier accepted', 'success'),
-    createActivityEntry('Location found - Lomé, Togo', 'info'),
-    createActivityEntry('Device locked remotely', 'warning')
+    createActivityEntry('Identifiant accepté', 'success'),
+    createActivityEntry('Localisation trouvée - Lomé, Togo', 'info'),
+    createActivityEntry('Appareil verrouillé à distance', 'warning')
   ]);
   const [isPriority, setIsPriority] = useState(false);
   const [isFamilyPlan, setIsFamilyPlan] = useState(false);
@@ -92,7 +92,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
-        addActivity('Device moving - tracking update', 'info', [newLat, newLng]);
+        addActivity('Mise à jour du traçage - Appareil en mouvement', 'info', [newLat, newLng]);
         
         // System 1 & 4: Geofencing & Check-in
         if (isFamilyPlan) {
@@ -107,7 +107,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         }
 
         if (Math.random() > 0.7) {
-          addActivity('Proximity Alert: Target entered secure perimeter', 'warning');
+          addActivity('Alerte de proximité : Cible entrée dans le périmètre de sécurité', 'warning');
           try {
             const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
@@ -143,10 +143,10 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
 
   const executeAction = (action: string) => {
     const messages = {
-      ring: 'Device is now ringing...',
-      lock: 'Device has been locked remotely',
-      wipe: 'Data wipe initiated - This cannot be undone!',
-      panic: 'MOD RE URGENCE: Tracking haute fréquence activé, micro/caméra ouverts'
+      ring: 'L\'appareil sonne actuellement...',
+      lock: 'L\'appareil a été verrouillé à distance',
+      wipe: 'Effacement des données initié - Cette action est irréversible !',
+      panic: 'MODE URGENCE : Traçage haute fréquence activé, micro/caméra ouverts'
     };
 
     const types: Record<string, ActivityEntry['type']> = {
@@ -338,7 +338,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                     <ShieldAlert size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm truncate text-red-300">PANIC MODE</h4>
+                    <h4 className="font-bold text-sm truncate text-red-300">MODE PANIQUE</h4>
                     <p className="text-xs text-red-400/60 truncate">Activez l'urgence maximale</p>
                   </div>
                 </button>
@@ -396,19 +396,31 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                       key={activity.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className={`group p-2 rounded-xl transition-colors ${activity.location ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                      className={`group p-3 rounded-xl transition-all border border-transparent ${activity.location ? 'cursor-pointer hover:bg-white/5 hover:border-white/10' : ''}`}
                       onClick={() => handleActivityClick(activity)}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <p className={`text-xs sm:text-sm font-medium ${
-                          activity.type === 'warning' ? 'text-amber-400' : 'text-slate-200'
-                        }`}>
-                          {activity.message}
-                          {activity.location && <MapPin size={12} className="inline ml-2 text-primary/60 group-hover:text-primary transition-colors" />}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className={`text-xs sm:text-sm font-medium ${
+                            activity.type === 'warning' ? 'text-amber-400' : 
+                            activity.type === 'error' ? 'text-red-400' :
+                            activity.type === 'success' ? 'text-emerald-400' :
+                            'text-slate-200'
+                          }`}>
+                            {activity.message}
+                          </p>
+                          {activity.location && (
+                            <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary group-hover:bg-primary/10 transition-colors">
+                              REVOIR
+                            </Badge>
+                          )}
+                        </div>
                         {activity.type === 'warning' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />}
                       </div>
-                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-widest">{activity.time}</p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-widest">{activity.time}</p>
+                        {activity.location && <MapPin size={10} className="text-primary/40 group-hover:text-primary transition-colors" />}
+                      </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>

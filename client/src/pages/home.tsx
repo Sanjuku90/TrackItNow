@@ -67,35 +67,35 @@ export default function Home() {
   };
 
   const stats = [
-    { number: "50,000+", label: "Devices Located", icon: MapPin },
-    { number: "99.8%", label: "Success Rate", icon: CheckCircle },
-    { number: "2 mins", label: "Average Time", icon: Clock },
-    { number: "24/7", label: "Support Available", icon: Shield }
+    { number: "50,000+", label: "Appareils Localisés", icon: MapPin },
+    { number: "99.8%", label: "Taux de Réussite", icon: CheckCircle },
+    { number: "2 mins", label: "Temps Moyen", icon: Clock },
+    { number: "24/7", label: "Support Disponible", icon: Shield }
   ];
 
   const features = [
     {
       icon: Satellite,
-      title: "Real-time GPS Tracking",
-      description: "Precise location tracking with advanced satellite technology",
+      title: "Traçage GPS Temps Réel",
+      description: "Suivi de localisation précis grâce à une technologie satellite avancée",
       color: "blue"
     },
     {
       icon: Shield,
-      title: "Military-grade Security",
-      description: "Your data is encrypted with bank-level security protocols",
+      title: "Sécurité de Grade Militaire",
+      description: "Vos données sont cryptées avec des protocoles de sécurité de niveau bancaire",
       color: "emerald"
     },
     {
       icon: Globe,
-      title: "Global Coverage",
-      description: "Works worldwide on all Android and iOS devices",
+      title: "Couverture Mondiale",
+      description: "Fonctionne partout dans le monde sur tous les appareils Android et iOS",
       color: "purple"
     },
     {
       icon: Zap,
-      title: "Instant Results",
-      description: "Get location coordinates within minutes of activation",
+      title: "Résultats Instantanés",
+      description: "Obtenez les coordonnées de localisation quelques minutes après l'activation",
       color: "orange"
     }
   ];
@@ -120,9 +120,9 @@ export default function Home() {
               <span className="text-xl font-bold tracking-tight">TrackIt <span className="text-primary">Now</span></span>
             </div>
             <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
-              <a href="#" className="hover:text-white transition-colors">Features</a>
-              <a href="#" className="hover:text-white transition-colors">How it works</a>
-              <a href="#" className="hover:text-white transition-colors">Pricing</a>
+              <a href="#" className="hover:text-white transition-colors">Fonctionnalités</a>
+              <a href="#" className="hover:text-white transition-colors">Comment ça marche</a>
+              <a href="#" className="hover:text-white transition-colors">Tarifs</a>
             </nav>
             <div className="flex items-center space-x-4">
               {user ? (
@@ -170,14 +170,14 @@ export default function Home() {
             >
               <Badge variant="outline" className="mb-6 py-1.5 px-4 rounded-full border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wider uppercase">
                 <Zap className="w-3 h-3 mr-2 fill-primary" />
-                Next-Gen Device Recovery
+                Récupération de Dispositif Nouvelle Génération
               </Badge>
               <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-8">
-                Locate Any Device <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-emerald-400">With 99.8% Accuracy</span>
+                Localisez n'importe quel appareil <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-emerald-400">Avec une Précision de 99,8%</span>
               </h1>
               <p className="text-xl text-slate-400 mb-10 leading-relaxed max-w-xl">
-                Track lost or stolen Android and iOS devices instantly. Our military-grade satellite integration provides real-time GPS coordinates anywhere in the world.
+                Suivez instantanément les appareils Android et iOS perdus ou volés. Notre intégration satellite de qualité militaire fournit des coordonnées GPS en temps réel partout dans le monde.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
@@ -185,7 +185,7 @@ export default function Home() {
                   className="h-14 px-8 rounded-full text-lg font-semibold bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20"
                   onClick={() => handleTrackingClick("standard")}
                 >
-                  Start Tracking Now
+                  Démarrer le Suivi Maintenant
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <div className="flex -space-x-3 items-center ml-4">
@@ -198,7 +198,7 @@ export default function Home() {
                     <div className="flex items-center text-yellow-500 mb-0.5">
                       {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-current" />)}
                     </div>
-                    <div className="text-xs text-slate-400 font-medium">50k+ Happy Users</div>
+                    <div className="text-xs text-slate-400 font-medium">+50k Utilisateurs Satisfaits</div>
                   </div>
                 </div>
               </div>
@@ -223,9 +223,9 @@ export default function Home() {
                 <div className="absolute top-10 right-10 bg-[#0A0E1A]/90 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-2xl">
                   <div className="flex items-center space-x-3 mb-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Live Status</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Statut en Direct</span>
                   </div>
-                  <div className="text-sm font-semibold">Signal Strength: 100%</div>
+                  <div className="text-sm font-semibold">Force du Signal: 100%</div>
                 </div>
               </div>
             </motion.div>
@@ -254,8 +254,8 @@ export default function Home() {
       <section className="py-32">
         <div className="container mx-auto px-6">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl font-bold mb-6">Powerful Features for Peace of Mind</h2>
-            <p className="text-lg text-slate-400">Our platform combines cutting-edge satellite technology with an intuitive interface to help you recover your property faster.</p>
+            <h2 className="text-4xl font-bold mb-6">Des Fonctionnalités Puissantes pour votre Tranquillité</h2>
+            <p className="text-lg text-slate-400">Notre plateforme combine une technologie satellite de pointe avec une interface intuitive pour vous aider à retrouver vos biens plus rapidement.</p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -280,11 +280,11 @@ export default function Home() {
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-[2.5rem] p-12 overflow-hidden relative group">
               <div className="relative z-10">
-                <Badge className="mb-6 rounded-full bg-blue-500/20 text-blue-400 border-none px-4 py-1">Advanced Maps</Badge>
-                <h3 className="text-4xl font-bold mb-6 max-w-md">Precise Visualization with Interactive Maps</h3>
-                <p className="text-lg text-slate-400 max-w-sm mb-8">Get a bird's-eye view of your device's movement with our high-resolution mapping system.</p>
+                <Badge className="mb-6 rounded-full bg-blue-500/20 text-blue-400 border-none px-4 py-1">Cartes Avancées</Badge>
+                <h3 className="text-4xl font-bold mb-6 max-w-md">Visualisation Précise avec Cartes Interactives</h3>
+                <p className="text-lg text-slate-400 max-w-sm mb-8">Obtenez une vue d'ensemble des mouvements de votre appareil grâce à notre système de cartographie haute résolution.</p>
                 <Button variant="ghost" className="group/btn p-0 hover:bg-transparent text-primary">
-                  Learn more <ChevronRight className="ml-1 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  En savoir plus <ChevronRight className="ml-1 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Button>
               </div>
               <div className="absolute bottom-[-10%] right-[-10%] w-[60%] opacity-20 group-hover:opacity-40 transition-opacity duration-700">
@@ -294,8 +294,8 @@ export default function Home() {
             
             <div className="bg-primary border border-primary/20 rounded-[2.5rem] p-12 text-white relative overflow-hidden">
               <div className="relative z-10">
-                <h3 className="text-3xl font-bold mb-6">Global Signal Network</h3>
-                <p className="text-blue-100 mb-8 leading-relaxed text-lg">Connect to over 400 satellites for instantaneous tracking coverage on all continents.</p>
+                <h3 className="text-3xl font-bold mb-6">Réseau de Signal Mondial</h3>
+                <p className="text-blue-100 mb-8 leading-relaxed text-lg">Connectez-vous à plus de 400 satellites pour une couverture de suivi instantanée sur tous les continents.</p>
                 <div className="pt-4 flex items-center space-x-2">
                   {[1,2,3].map(i => <div key={i} className="w-2 h-2 rounded-full bg-white animate-pulse" style={{ animationDelay: `${i*0.2}s` }} />)}
                 </div>
@@ -313,9 +313,9 @@ export default function Home() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-primary/20 blur-[150px] -z-10 rounded-full" />
         
         <div className="container mx-auto px-6 text-center">
-          <h2 className="text-5xl font-bold mb-8">Ready to Recover Your Device?</h2>
+          <h2 className="text-5xl font-bold mb-8">Prêt à Retrouver votre Appareil ?</h2>
           <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto leading-relaxed">
-            Choose the tracking plan that fits your needs. Our standard and priority services both offer guaranteed results.
+            Choisissez le plan de traçage qui correspond à vos besoins. Nos services standard et prioritaire offrent tous deux des résultats garantis.
           </p>
           
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">

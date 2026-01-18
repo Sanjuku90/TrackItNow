@@ -6,13 +6,22 @@ const ADMIN_EMAIL = 'trackitnoww@gmail.com';
 // Utiliser la variable d'environnement si disponible, sinon fallback sur la valeur en dur
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'rhlz xgeg chxh yoic';
 
-// Configuration du transporteur Gmail
+// Configuration du transporteur Gmail optimisée pour Render
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD
-  }
+  },
+  tls: {
+    // Ne pas échouer sur les certificats invalides (souvent utile en cloud)
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 15000, // 15 secondes
+  greetingTimeout: 15000,
+  socketTimeout: 15000
 });
 
 // Test de la configuration du transporteur

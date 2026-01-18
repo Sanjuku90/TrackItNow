@@ -54,11 +54,8 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         createActivityEntry('Dernière position connue affichée', 'info')
       ];
     }
-    return [
-      createActivityEntry('Identifiant accepté', 'success'),
-      createActivityEntry('Localisation trouvée - Lomé, Togo', 'info'),
-      createActivityEntry('Appareil verrouillé à distance', 'warning')
-    ];
+    // No hardcoded activities for new sessions
+    return [];
   });
   const [isPriority, setIsPriority] = useState(false);
   const [geofences, setGeofences] = useState<{name: string, lat: number, lng: number, radius: number}[]>([]);

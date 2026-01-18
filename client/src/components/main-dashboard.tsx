@@ -166,12 +166,18 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     if (!L) return;
 
     const map = L.map(mapRef.current, {
-      zoomControl: false,
+      zoomControl: true,
       attributionControl: false
-    }).setView(currentLocation, 13);
+    }).setView(currentLocation, 15);
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 20
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Optional: Add a subtle overlay for a more technical look
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+      pane: 'shadowPane'
     }).addTo(map);
 
     const deviceIcon = L.divIcon({
@@ -234,7 +240,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
               <CardContent className="p-0">
                 <div 
                   ref={mapRef}
-                  className="h-[400px] sm:h-[500px] w-full grayscale-[0.5] contrast-[1.2]"
+                  className="h-[400px] sm:h-[500px] w-full rounded-2xl sm:rounded-[2.5rem]"
                 />
                 
                 {/* Floating Map Stats */}

@@ -209,8 +209,8 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-6 max-w-7xl mx-auto px-0 sm:px-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 sm:px-0">
         <div>
           <div className="flex items-center space-x-3 mb-2">
             <Badge className="bg-emerald-500/20 text-emerald-400 border-none px-3">Live Tracking</Badge>
@@ -232,49 +232,49 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 px-4 sm:px-0 items-start">
+        <div className="lg:col-span-2 space-y-6">
           {/* Map Card */}
           <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-emerald-500/50 rounded-[2.5rem] blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
-            <Card className="relative bg-[#0A0E1A] border-white/5 rounded-[2.5rem] overflow-hidden">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-emerald-500/50 rounded-2xl sm:rounded-[2.5rem] blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+            <Card className="relative bg-[#0A0E1A] border-white/5 rounded-2xl sm:rounded-[2.5rem] overflow-hidden">
               <CardContent className="p-0">
                 <div 
                   ref={mapRef}
-                  className="h-[500px] w-full grayscale-[0.5] contrast-[1.2]"
+                  className="h-[400px] sm:h-[500px] w-full grayscale-[0.5] contrast-[1.2]"
                 />
                 
                 {/* Floating Map Stats */}
-                <div className="absolute top-6 left-6 right-6 flex justify-between items-start pointer-events-none">
-                  <div className="flex flex-col gap-3">
+                <div className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 flex justify-between items-start pointer-events-none">
+                  <div className="flex flex-col gap-2 sm:gap-3">
                     {[
                       { label: 'Battery', value: '36%', icon: Battery, color: 'emerald' },
                       { label: 'Status', value: 'Locked', icon: LockKeyhole, color: 'white' }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-3 pr-6 rounded-2xl flex items-center space-x-3 shadow-2xl pointer-events-auto">
-                        <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${stat.color === 'emerald' ? 'text-emerald-400' : 'text-white'}`}>
-                          <stat.icon size={20} />
+                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-2 sm:p-3 pr-4 sm:pr-6 rounded-xl sm:rounded-2xl flex items-center space-x-2 sm:space-x-3 shadow-2xl pointer-events-auto">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${stat.color === 'emerald' ? 'text-emerald-400' : 'text-white'}`}>
+                          <stat.icon size={16} />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
-                          <p className="text-base font-bold">{stat.value}</p>
+                          <p className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
+                          <p className="text-sm sm:text-base font-bold">{stat.value}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex flex-col gap-3 items-end">
+                  <div className="flex flex-col gap-2 sm:gap-3 items-end">
                     {[
                       { label: 'Signal', value: 'Excellent', icon: Signal, color: 'blue' },
                       { label: 'Pulse', value: 'Active', icon: Activity, color: 'white' }
                     ].map((stat, i) => (
-                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-3 pl-6 rounded-2xl flex items-center space-x-3 shadow-2xl pointer-events-auto">
+                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-2 sm:p-3 pl-4 sm:pl-6 rounded-xl sm:rounded-2xl flex items-center space-x-2 sm:space-x-3 shadow-2xl pointer-events-auto">
                         <div className="text-right">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
-                          <p className="text-base font-bold">{stat.value}</p>
+                          <p className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
+                          <p className="text-sm sm:text-base font-bold">{stat.value}</p>
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-blue-400">
-                          <stat.icon size={20} />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-blue-400">
+                          <stat.icon size={16} />
                         </div>
                       </div>
                     ))}
@@ -285,24 +285,24 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           </div>
 
           {/* AI Insights */}
-          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8">
-            <div className="flex items-start space-x-6">
-              <div className="w-16 h-16 rounded-[1.5rem] bg-primary/20 flex items-center justify-center text-primary shrink-0 animate-pulse">
-                <Bot size={32} />
+          <Card className="bg-white/5 border-white/5 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.5rem] bg-primary/20 flex items-center justify-center text-primary shrink-0 animate-pulse">
+                <Bot size={28} className="sm:size-8" />
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <h3 className="font-bold text-lg">Predictive Assistant</h3>
-                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest border-primary/20 text-primary">Active</Badge>
+              <div className="space-y-3 sm:space-y-4 w-full">
+                <div className="flex items-center justify-center sm:justify-start space-x-2">
+                  <h3 className="font-bold text-base sm:text-lg">Predictive Assistant</h3>
+                  <Badge variant="outline" className="text-[8px] sm:text-[10px] uppercase font-bold tracking-widest border-primary/20 text-primary">Active</Badge>
                 </div>
-                <p className="text-slate-400 leading-relaxed text-lg italic">
+                <p className="text-slate-400 leading-relaxed text-sm sm:text-lg italic">
                   "Target device is currently stationary at a residence in Lomé. Signal stability is optimal. Battery levels suggest approximately 4 hours of operation remaining. Recommend enabling remote lock if the device is not in a safe zone."
                 </p>
-                <div className="flex items-center space-x-4">
-                  <Button variant="default" size="sm" className="rounded-xl h-10 px-6 font-bold bg-primary hover:bg-primary/90" onClick={() => executeAction('lock')}>
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 pt-2">
+                  <Button variant="default" size="sm" className="w-full sm:w-auto rounded-xl h-10 px-6 font-bold bg-primary hover:bg-primary/90" onClick={() => executeAction('lock')}>
                     Confirm Remote Lock
                   </Button>
-                  <Button variant="ghost" size="sm" className="rounded-xl h-10 px-6 text-slate-400 hover:text-white hover:bg-white/5">
+                  <Button variant="ghost" size="sm" className="w-full sm:w-auto rounded-xl h-10 px-6 text-slate-400 hover:text-white hover:bg-white/5">
                     Ignore Recommendation
                   </Button>
                 </div>
@@ -311,11 +311,10 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           </Card>
         </div>
 
-        <div className="space-y-8">
-          {/* Action Center */}
-          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8">
-            <h3 className="text-xl font-bold mb-8 flex items-center">
-              <Settings className="text-primary mr-3" size={24} />
+        <div className="space-y-6">
+          <Card className="bg-white/5 border-white/5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8">
+            <h3 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 flex items-center">
+              <Settings className="text-primary mr-3" size={20} />
               Action Center
             </h3>
             
@@ -370,18 +369,17 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             </div>
           </Card>
 
-          {/* Activity Log */}
-          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8 h-[450px] flex flex-col">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-xl font-bold flex items-center">
-                <History className="text-primary mr-3" size={24} />
+          <Card className="bg-white/5 border-white/5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8 h-[400px] sm:h-[450px] flex flex-col">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
+              <h3 className="text-lg sm:text-xl font-bold flex items-center">
+                <History className="text-primary mr-3" size={20} />
                 Terminal Logs
               </h3>
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
             
             <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 <AnimatePresence initial={false}>
                   {activities.map((activity) => (
                     <motion.div
@@ -391,14 +389,14 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                       className="group"
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <p className={`text-sm font-medium ${
+                        <p className={`text-xs sm:text-sm font-medium ${
                           activity.type === 'warning' ? 'text-amber-400' : 'text-slate-200'
                         }`}>
                           {activity.message}
                         </p>
                         {activity.type === 'warning' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />}
                       </div>
-                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{activity.time}</p>
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-widest">{activity.time}</p>
                     </motion.div>
                   ))}
                 </AnimatePresence>

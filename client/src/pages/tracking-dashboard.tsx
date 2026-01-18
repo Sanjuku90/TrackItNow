@@ -223,10 +223,10 @@ export default function TrackingDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-10 sm:pb-20 max-w-5xl">
-        <div className="relative">
+      <main className="container mx-auto px-4 sm:px-6 pt-20 sm:pt-28 pb-10 sm:pb-20 max-w-7xl flex flex-col items-center">
+        <div className="relative w-full">
           {/* Progress Indicator */}
-          <div className="mb-8 sm:mb-12 flex justify-between items-center max-w-2xl mx-auto px-2 sm:px-4">
+          <div className="mb-6 sm:mb-10 flex justify-between items-center max-w-xl mx-auto px-2 sm:px-4">
             {['platform', 'device', 'identifier', 'payment', 'dashboard'].map((step, i) => {
               const isActive = currentStep === step || 
                 (step === 'platform' && currentStep !== 'platform') ||

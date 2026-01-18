@@ -190,32 +190,32 @@ export default function TrackingDashboard() {
     <div className="min-h-screen bg-[#0A0E1A] text-slate-50 overflow-x-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0E1A]/80 backdrop-blur-xl border-b border-white/5">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Link href="/">
-                <Button variant="ghost" size="icon" className="mr-2 hover:bg-white/5">
-                  <ArrowLeft className="w-5 h-5" />
+                <Button variant="ghost" size="icon" className="w-8 h-8 sm:w-10 sm:h-10 hover:bg-white/5">
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               </Link>
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                <Satellite className="text-white" size={22} />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg sm:rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <Satellite className="text-white w-4 h-4 sm:w-5.5 sm:h-5.5" />
               </div>
-              <span className="text-xl font-bold tracking-tight hidden sm:inline">TrackIt <span className="text-primary">Now</span></span>
+              <span className="text-lg sm:text-xl font-bold tracking-tight hidden xs:inline">TrackIt <span className="text-primary">Now</span></span>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center space-x-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure Link</span>
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="px-2 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center space-x-1.5 sm:space-x-2">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure</span>
               </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => apiRequest("POST", "/api/logout").then(() => setLocation("/"))}
-                className="hover:bg-red-500/10 hover:text-red-400"
+                className="h-8 sm:h-9 hover:bg-red-500/10 hover:text-red-400 text-xs sm:text-sm"
               >
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
           </div>
@@ -223,10 +223,10 @@ export default function TrackingDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 pt-32 pb-20 max-w-5xl">
+      <main className="container mx-auto px-4 sm:px-6 pt-24 sm:pt-32 pb-10 sm:pb-20 max-w-5xl">
         <div className="relative">
           {/* Progress Indicator */}
-          <div className="mb-12 flex justify-between items-center max-w-2xl mx-auto px-4">
+          <div className="mb-8 sm:mb-12 flex justify-between items-center max-w-2xl mx-auto px-2 sm:px-4">
             {['platform', 'device', 'identifier', 'payment', 'dashboard'].map((step, i) => {
               const isActive = currentStep === step || 
                 (step === 'platform' && currentStep !== 'platform') ||
@@ -236,10 +236,10 @@ export default function TrackingDashboard() {
               
               return (
                 <div key={step} className="flex flex-col items-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-primary border-primary shadow-lg shadow-primary/20' : 'border-white/10 bg-white/5 text-slate-500'}`}>
-                    <span className="text-xs font-bold">{i + 1}</span>
+                  <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-primary border-primary shadow-lg shadow-primary/20' : 'border-white/10 bg-white/5 text-slate-500'}`}>
+                    <span className="text-[10px] sm:text-xs font-bold">{i + 1}</span>
                   </div>
-                  <span className={`text-[10px] uppercase font-bold tracking-widest mt-3 transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>{step}</span>
+                  <span className={`text-[8px] sm:text-[10px] uppercase font-bold tracking-widest mt-2 sm:mt-3 transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>{step}</span>
                 </div>
               );
             })}
@@ -251,7 +251,7 @@ export default function TrackingDashboard() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
-            className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 lg:p-12 backdrop-blur-sm"
+            className="bg-white/5 border border-white/10 rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8 lg:p-12 backdrop-blur-sm"
           >
             {/* Step Content */}
             <AnimatePresence mode="wait">

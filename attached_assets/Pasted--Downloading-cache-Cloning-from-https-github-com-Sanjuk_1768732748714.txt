@@ -1,0 +1,75 @@
+==> Downloading cache...
+==> Cloning from https://github.com/Sanjuku90/TrackItNow
+==> Checking out commit d7750f690401a56dfd1977d74cc4731dfbbf427c in branch main
+==> Downloaded 223MB in 7s. Extraction took 4s.
+==> Using Node.js version 22.16.0 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Running build command 'npm install; npm run build'...
+up to date, audited 551 packages in 1s
+70 packages are looking for funding
+  run `npm fund` for details
+14 vulnerabilities (1 low, 8 moderate, 5 high)
+To address issues that do not require attention, run:
+  npm audit fix
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+Run `npm audit` for details.
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+vite v5.4.19 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 2178 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/public/index.html                                                           0.63 kB │ gzip:   0.38 kB
+../dist/public/assets/modern_high-tech_device_tracking_hero_image-B99ggVS6.png  1,259.30 kB
+../dist/public/assets/index-DAWeN3dQ.css                                           83.83 kB │ gzip:  14.09 kB
+../dist/public/assets/index-DiXOuFAU.js                                           673.38 kB │ gzip: 202.89 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 4.35s
+  dist/index.js  31.2kb
+⚡ Done in 4ms
+==> Uploading build...
+==> Uploaded in 6.0s. Compression took 2.8s
+==> Build successful 🎉
+==> Deploying...
+==> Your service is live 🎉
+==> 
+==> ///////////////////////////////////////////////////////////
+==> 
+==> Available at your primary URL https://trackitnow-ohhe.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+    at SMTPConnection._formatError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection._onError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:795:20)
+    at Timeout.<anonymous> (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:237:22)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7) {
+  code: 'ETIMEDOUT',
+  command: 'CONN'
+}
+Please ensure GMAIL_APP_PASSWORD environment variable is set correctly.
+==> Detected service running on port 10000
+==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+10:27:58 AM [express] GET /api/user 401 in 2ms :: {"error":"Not logged in"}
+10:28:09 AM [express] GET /api/user 401 in 1ms :: {"error":"Not logged in"}
+10:29:05 AM [express] POST /api/login 401 in 1ms :: {"error":"Invalid email or password"}
+10:29:19 AM [express] GET /api/user 401 in 1ms :: {"error":"Not logged in"}
+10:29:20 AM [express] POST /api/register 200 in 2ms :: {"email":"","password":"","isAdmin":false,"id"…
+10:29:21 AM [express] GET /api/user 200 in 2ms :: {"email":"","password":"","isAdmin":false,"id":1}
+10:31:33 AM [express] POST /api/login 401 in 0ms :: {"error":"Invalid email or password"}
+10:31:39 AM [express] POST /api/register 200 in 0ms :: {"email":"a@gmail.com","password":"aaaaaa","is…
+10:31:40 AM [express] GET /api/user 200 in 1ms :: {"email":"a@gmail.com","password":"aaaaaa","isAdmin…
+10:32:58 AM [express] GET /api/user 304 in 0ms :: {"email":"","password":"","isAdmin":false,"id":1}
+10:33:10 AM [express] GET /api/admin/purchases 200 in 1ms :: []
+10:33:38 AM [express] GET /api/admin/purchases 304 in 1ms :: []
+10:33:53 AM [express] GET /api/admin/purchases 200 in 0ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:07 AM [express] GET /api/admin/purchases 200 in 1ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:13 AM [express] GET /api/admin/purchases 200 in 1ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:19 AM [express] GET /api/

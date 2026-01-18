@@ -3,14 +3,12 @@ import nodemailer from 'nodemailer';
 // Configuration des emails
 const GMAIL_USER = 'trackitnoww@gmail.com';
 const ADMIN_EMAIL = 'trackitnoww@gmail.com';
-const GMAIL_APP_PASSWORD = 'rhlz xgeg chxh yoic';
+// Utiliser la variable d'environnement si disponible, sinon fallback sur la valeur en dur
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'rhlz xgeg chxh yoic';
 
 // Configuration du transporteur Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD

@@ -38,8 +38,17 @@ export default function TrackingDashboard() {
   });
 
   useEffect(() => {
-    // Check if fast track is requested via URL
+    // Check if we're reviewing an old request
     const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      setCurrentStep('dashboard');
+      toast({
+        title: "Historique chargé",
+        description: `Visualisation de la position sauvegardée pour ${id}`,
+      });
+    }
+
     const fast = params.get('fast') === 'true';
     if (fast) {
       setIsFastTrack(true);

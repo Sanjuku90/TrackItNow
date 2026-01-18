@@ -19,6 +19,8 @@ export const purchases = pgTable("purchases", {
   userEmail: text("user_email").notNull(),
   trackingType: text("tracking_type", { enum: ["standard", "priority"] }).notNull().default("standard"),
   lastTrackingUpdate: text("last_tracking_update"),
+  lastLat: text("last_lat"),
+  lastLng: text("last_lng"),
   premiumExpiry: text("premium_expiry"),
 });
 

@@ -34,16 +34,38 @@ interface MainDashboardProps {
 
 export function MainDashboard({ isVisible }: MainDashboardProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [currentLocation, setCurrentLocation] = useState(generateLomeLocation());
+  const [currentLocation, setCurrentLocation] = useState<[number, number]>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      // Mock historical data based on ID for demo
+      // In production this would come from the database
+      return [6.1375 + (parseInt(id.split('-')[1]) % 100) * 0.0001, 1.2125 + (parseInt(id.split('-')[1]) % 100) * 0.0001];
+    }
+    return generateLomeLocation();
+  });
   const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); 
-  const [activities, setActivities] = useState<ActivityEntry[]>([
-    createActivityEntry('Identifiant accepté', 'success'),
-    createActivityEntry('Localisation trouvée - Lomé, Togo', 'info'),
-    createActivityEntry('Appareil verrouillé à distance', 'warning')
-  ]);
+  const [activities, setActivities] = useState<ActivityEntry[]>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      return [
+        createActivityEntry(`Historique récupéré pour ${id}`, 'success'),
+        createActivityEntry('Dernière position connue affichée', 'info')
+      ];
+    }
+    return [
+      createActivityEntry('Identifiant accepté', 'success'),
+      createActivityEntry('Localisation trouvée - Lomé, Togo', 'info'),
+      createActivityEntry('Appareil verrouillé à distance', 'warning')
+    ];
+  });
   const [isPriority, setIsPriority] = useState(false);
   const [geofences, setGeofences] = useState<{name: string, lat: number, lng: number, radius: number}[]>([]);
   const [breadcrumbTrail, setBreadcrumbTrail] = useState<[number, number][]>([]);
+  const [isReviewMode, setIsReviewMode] = useState(() => {
+    return new URLSearchParams(window.location.search).has('id');
+  });
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -60,6 +82,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   };
 
   useEffect(() => {
+    if (isReviewMode) return; // Don't move if reviewing old data
     if (!isVisible) return;
     
     const moveInterval = setInterval(() => {

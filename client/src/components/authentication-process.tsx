@@ -16,10 +16,11 @@ interface AuthenticationProcessProps {
 
 export function AuthenticationProcess({ isVisible, onAuthComplete }: AuthenticationProcessProps) {
   const [steps, setSteps] = useState<AuthStep[]>([
-    { id: 1, message: "Verifying information...", completed: false, active: true },
-    { id: 2, message: "Secure authentication in progress...", completed: false, active: false },
-    { id: 3, message: "Code sent to backup address", completed: false, active: false },
-    { id: 4, message: "Location service access granted", completed: false, active: false }
+    { id: 1, message: "Scanning nearby cell towers...", completed: false, active: true },
+    { id: 2, message: "Decrypting cellular signal packets...", completed: false, active: false },
+    { id: 3, message: "Establishing secure satellite handshake...", completed: false, active: false },
+    { id: 4, message: "Finalizing high-precision GPS fix...", completed: false, active: false },
+    { id: 5, message: "Location service access granted", completed: false, active: false }
   ]);
 
   useEffect(() => {

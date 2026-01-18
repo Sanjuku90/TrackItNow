@@ -61,6 +61,21 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         
         // Add activity for movement
         addActivity('Device moving - tracking update', 'info');
+
+        // Proximity alert simulation
+        if (Math.random() > 0.7) {
+          addActivity('Proximity Alert: Target entered secure perimeter', 'warning');
+          // Simple beep sound effect if supported by browser
+          try {
+            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+          } catch (e) {}
+        }
         
         return [newLat, newLng] as [number, number];
       });

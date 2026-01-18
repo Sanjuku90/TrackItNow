@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { 
@@ -10,10 +10,43 @@ import {
 import { generateLomeLocation } from "../client/src/lib/device-data";
 import { insertPurchaseSchema } from "@shared/schema";
 
+interface SessionRequest extends Request {
+  session: any;
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Health check endpoint
-  app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  // Auth endpoints
+  app.post("/api/register", async (req, res) => {
+    const { email, password } = req.body;
+    const existing = await storage.getUserByEmail(email);
+    if (existing) return res.status(400).json({ error: "Email already registered" });
+    const user = await storage.createUser({ email, password, isAdmin: false });
+    (req as SessionRequest).session.userId = user.id;
+    res.json(user);
+  });
+
+  app.post("/api/login", async (req, res) => {
+    const { email, password } = req.body;
+    const user = await storage.getUserByEmail(email);
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    (req as SessionRequest).session.userId = user.id;
+    res.json(user);
+  });
+
+  app.post("/api/logout", (req, res) => {
+    (req as SessionRequest).session.destroy(() => {
+      res.json({ success: true });
+    });
+  });
+
+  app.get("/api/user", async (req, res) => {
+    const userId = (req as SessionRequest).session.userId;
+    if (!userId) return res.status(401).json({ error: "Not logged in" });
+    const user = await storage.getUser(userId);
+    if (!user) return res.status(401).json({ error: "User not found" });
+    res.json(user);
   });
 
   // Admin: Get all purchases

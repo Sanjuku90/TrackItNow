@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Satellite } from "lucide-react";
@@ -12,10 +13,12 @@ import { MainDashboard } from "@/components/main-dashboard";
 import { Platform } from "@/lib/device-data";
 import { generateIMEI } from "@/lib/tracking-utils";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 type Step = 'platform' | 'device' | 'identifier' | 'auth' | 'imei' | 'payment' | 'dashboard';
 
 export default function TrackingDashboard() {
+  const [, setLocation] = useLocation();
   const [currentStep, setCurrentStep] = useState<Step>('platform');
   const [selectedPlatform, setSelectedPlatform] = useState<Platform>('');
   const [selectedDevice, setSelectedDevice] = useState('');
@@ -27,13 +30,30 @@ export default function TrackingDashboard() {
   const [isFastTrack, setIsFastTrack] = useState(false);
   const { toast } = useToast();
 
+  const { data: user, isLoading: isUserLoading } = useQuery({ 
+    queryKey: ["/api/user"],
+    retry: false
+  });
+
   useEffect(() => {
     // Check if fast track is requested via URL
     const params = new URLSearchParams(window.location.search);
-    if (params.get('fast') === 'true') {
+    const fast = params.get('fast') === 'true';
+    if (fast) {
       setIsFastTrack(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (isFastTrack && !isUserLoading && !user) {
+      toast({
+        title: "Authentification requise",
+        description: "Veuillez vous connecter pour utiliser le plan Premium.",
+        variant: "destructive"
+      });
+      setLocation("/?auth=true");
+    }
+  }, [isFastTrack, isUserLoading, user, setLocation, toast]);
 
   useEffect(() => {
     // Add Leaflet CSS and JS

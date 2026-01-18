@@ -14,9 +14,49 @@ import {
   Award
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { data: user } = useQuery({ 
+    queryKey: ["/api/user"],
+    retry: false
+  });
+
+  const [showAuth, setShowAuth] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await apiRequest("POST", isLogin ? "/api/login" : "/api/register", { email, password });
+      window.location.reload();
+    } catch (e: any) {
+      toast({ title: "Auth failed", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handlePremiumClick = () => {
+    if (!user) {
+      setShowAuth(true);
+    } else {
+      setLocation("/tracking?fast=true");
+    }
+  };
   const testimonials = [
     {
       name: "Sarah Johnson",
@@ -70,6 +110,13 @@ export default function Home() {
       description: "Get location coordinates within minutes of activation"
     }
   ];
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("auth") === "true") {
+      setShowAuth(true);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-50">
@@ -198,21 +245,56 @@ export default function Home() {
             Join thousands of satisfied customers who trust TrackIt Now for professional device recovery
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link href="/tracking">
-              <Button size="lg" variant="secondary" className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold w-full sm:w-auto">
-                Standard Tracking - $9.99
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              variant="secondary" 
+              className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold w-full sm:w-auto"
+              onClick={() => setLocation("/tracking")}
+            >
+              Standard Tracking - $9.99
+            </Button>
             <Button 
               size="lg" 
               className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto"
-              onClick={() => {
-                setLocation("/tracking?fast=true");
-              }}
+              onClick={handlePremiumClick}
             >
               Fast Track Priority - $32.90
             </Button>
+            {user && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => apiRequest("POST", "/api/logout").then(() => window.location.reload())}
+                className="w-full sm:w-auto"
+              >
+                Logout ({user.email})
+              </Button>
+            )}
           </div>
+
+          <Dialog open={showAuth} onOpenChange={setShowAuth}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{isLogin ? "Login for Premium" : "Sign Up for Premium"}</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleAuth} className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Password</Label>
+                  <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+                </div>
+                <Button type="submit" className="w-full">
+                  {isLogin ? "Login" : "Sign Up"}
+                </Button>
+                <Button variant="ghost" className="w-full" onClick={() => setIsLogin(!isLogin)}>
+                  {isLogin ? "Need an account? Sign up" : "Have an account? Login"}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </section>
 

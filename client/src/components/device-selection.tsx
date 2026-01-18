@@ -2,9 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Smartphone, Search, Check } from "lucide-react";
+import { Smartphone, Search, Check, ChevronRight } from "lucide-react";
 import { deviceData, Platform } from "@/lib/device-data";
 import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 
 interface DeviceSelectionProps {
   platform: Platform;
@@ -27,86 +28,77 @@ export function DeviceSelection({ platform, selectedDevice, onDeviceSelect, isVi
   if (!isVisible || !platform) return null;
 
   return (
-    <div className="mb-8 animate-in slide-in-from-bottom-5 duration-300">
-      <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-        <CardContent className="p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Smartphone className="text-blue-400 mr-3" size={24} />
-            Select Device Model
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <Label className="block text-sm font-medium mb-2 text-slate-300">
-                Search your device
-              </Label>
-              <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={18} />
-                <Input
-                  type="text"
-                  placeholder="Search by brand or model..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500"
-                  data-testid="input-device-search"
-                />
-              </div>
-              
-              <Label className="block text-sm font-medium mb-2 text-slate-300">
-                {filteredDevices.length} device{filteredDevices.length !== 1 ? 's' : ''} found
-              </Label>
-              
-              <ScrollArea className="h-64 rounded-lg border border-slate-600 bg-slate-700/50">
-                <div className="p-2">
-                  {filteredDevices.length > 0 ? (
-                    filteredDevices.map((device) => (
-                      <button
-                        key={device}
-                        onClick={() => onDeviceSelect(device)}
-                        className={`w-full text-left px-4 py-3 rounded-lg mb-1 transition-all flex items-center justify-between ${
-                          selectedDevice === device 
-                            ? 'bg-blue-500 text-white' 
-                            : 'hover:bg-slate-600 text-slate-200'
-                        }`}
-                        data-testid={`button-device-${device.replace(/\s+/g, '-').toLowerCase()}`}
-                      >
-                        <span className="flex items-center">
-                          <Smartphone className="mr-3" size={18} />
-                          {device}
-                        </span>
-                        {selectedDevice === device && <Check size={18} />}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-slate-400">
-                      <Smartphone className="mx-auto mb-2 opacity-50" size={32} />
-                      <p>No devices found for "{searchQuery}"</p>
-                      <p className="text-sm mt-1">Try a different search term</p>
-                    </div>
-                  )}
-                </div>
-              </ScrollArea>
-            </div>
-            
-            <div className="flex items-center justify-center">
-              <div className={`w-32 h-40 rounded-2xl border-2 flex items-center justify-center transition-all ${
-                selectedDevice 
-                  ? 'bg-blue-500/20 border-blue-500' 
-                  : 'bg-slate-700/50 border-dashed border-slate-600'
-              }`}>
-                <div className="text-center">
-                  <Smartphone className={`mx-auto ${selectedDevice ? 'text-blue-400' : 'text-slate-500'}`} size={48} />
-                  {selectedDevice && (
-                    <p className="text-xs mt-2 text-blue-300 px-2 truncate max-w-[120px]">
-                      {selectedDevice}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
+    <div className="max-w-4xl mx-auto">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold mb-4">Select Device Model</h2>
+        <p className="text-slate-400">Search for the specific model of the device you want to track.</p>
+      </div>
+      
+      <div className="grid lg:grid-cols-5 gap-8">
+        <div className="lg:col-span-3 space-y-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
+            <Input
+              type="text"
+              placeholder="Search by brand or model..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-14 pl-12 bg-white/5 border-white/10 rounded-2xl text-lg focus:ring-primary focus:border-primary"
+            />
           </div>
-        </CardContent>
-      </Card>
+          
+          <ScrollArea className="h-[400px] rounded-[2rem] border border-white/5 bg-white/[0.02] p-2">
+            <div className="grid gap-2">
+              {filteredDevices.map((device) => (
+                <button
+                  key={device}
+                  onClick={() => onDeviceSelect(device)}
+                  className={`w-full text-left px-6 py-4 rounded-2xl transition-all duration-200 flex items-center justify-between group ${
+                    selectedDevice === device 
+                      ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                      : 'hover:bg-white/5 text-slate-300'
+                  }`}
+                >
+                  <span className="flex items-center font-medium">
+                    <Smartphone className="mr-4 opacity-50" size={18} />
+                    {device}
+                  </span>
+                  {selectedDevice === device ? (
+                    <Check size={18} />
+                  ) : (
+                    <ChevronRight className="opacity-0 group-hover:opacity-50 transition-opacity" size={18} />
+                  )}
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+        
+        <div className="lg:col-span-2">
+          <div className={`h-full min-h-[300px] rounded-[2.5rem] border-2 border-dashed transition-all duration-500 flex flex-col items-center justify-center p-8 text-center ${
+            selectedDevice 
+              ? 'bg-primary/5 border-primary/30' 
+              : 'bg-white/[0.02] border-white/10'
+          }`}>
+            <motion.div
+              animate={selectedDevice ? { scale: [1, 1.1, 1] } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mb-6 transition-colors ${
+                selectedDevice ? 'bg-primary/20 text-primary' : 'bg-white/5 text-slate-600'
+              }`}>
+                <Smartphone size={48} />
+              </div>
+            </motion.div>
+            <h4 className="text-xl font-bold mb-2">{selectedDevice || 'No Device Selected'}</h4>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              {selectedDevice 
+                ? 'Device selected and ready for military-grade satellite authentication.' 
+                : 'Select a model from the list to proceed to the next step of tracking.'}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

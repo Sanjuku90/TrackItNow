@@ -11,7 +11,12 @@ import {
   Users,
   MapPin,
   Lock,
-  Award
+  Award,
+  ArrowRight,
+  ChevronRight,
+  Zap,
+  Layout,
+  MousePointer2
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +31,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import heroImage from "@assets/generated_images/modern_high-tech_device_tracking_hero_image.png";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -58,30 +65,6 @@ export default function Home() {
     }
   };
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      location: "New York, USA",
-      rating: 5,
-      comment: "Found my stolen iPhone in under 5 minutes! The location was incredibly accurate.",
-      device: "iPhone 14 Pro"
-    },
-    {
-      name: "Mohamed Al-Hassan",
-      location: "Dubai, UAE", 
-      rating: 5,
-      comment: "Perfect service. Helped me locate my son's lost Android phone quickly and safely.",
-      device: "Samsung Galaxy S23"
-    },
-    {
-      name: "Emma Martinez",
-      location: "Madrid, Spain",
-      rating: 5,
-      comment: "Professional and secure. Got my device back thanks to the precise GPS tracking.",
-      device: "iPhone 13"
-    }
-  ];
-
   const stats = [
     { number: "50,000+", label: "Devices Located", icon: MapPin },
     { number: "99.8%", label: "Success Rate", icon: CheckCircle },
@@ -93,22 +76,26 @@ export default function Home() {
     {
       icon: Satellite,
       title: "Real-time GPS Tracking",
-      description: "Precise location tracking with advanced satellite technology"
+      description: "Precise location tracking with advanced satellite technology",
+      color: "blue"
     },
     {
       icon: Shield,
       title: "Military-grade Security",
-      description: "Your data is encrypted with bank-level security protocols"
+      description: "Your data is encrypted with bank-level security protocols",
+      color: "emerald"
     },
     {
       icon: Globe,
       title: "Global Coverage",
-      description: "Works worldwide on all Android and iOS devices"
+      description: "Works worldwide on all Android and iOS devices",
+      color: "purple"
     },
     {
-      icon: Clock,
+      icon: Zap,
       title: "Instant Results",
-      description: "Get location coordinates within minutes of activation"
+      description: "Get location coordinates within minutes of activation",
+      color: "orange"
     }
   ];
 
@@ -120,87 +107,158 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-50">
-      {/* Header */}
-      <header className="bg-slate-800/50 backdrop-blur-lg border-b border-slate-700/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen bg-[#0A0E1A] text-slate-50 overflow-x-hidden">
+      {/* Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0E1A]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Satellite className="text-white" size={20} />
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <Satellite className="text-white" size={22} />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                TrackIt Now
-              </h1>
+              <span className="text-xl font-bold tracking-tight">TrackIt <span className="text-primary">Now</span></span>
             </div>
+            <nav className="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-400">
+              <a href="#" className="hover:text-white transition-colors">Features</a>
+              <a href="#" className="hover:text-white transition-colors">How it works</a>
+              <a href="#" className="hover:text-white transition-colors">Pricing</a>
+            </nav>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="border-green-500/50 text-green-400">
-                <Lock className="w-3 h-3 mr-1" />
-                SSL Secured
-              </Badge>
-              <Badge variant="outline" className="border-blue-500/50 text-blue-400">
-                <Award className="w-3 h-3 mr-1" />
-                GDPR Compliant
-              </Badge>
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-slate-400 hidden sm:inline">{user.email}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => apiRequest("POST", "/api/logout").then(() => window.location.reload())}
+                    className="hover:bg-white/5"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Button variant="default" size="sm" onClick={() => setShowAuth(true)} className="rounded-full px-6">
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-emerald-400 to-blue-400 bg-clip-text text-transparent">
-            Find Any Lost Device
-            <br />
-            <span className="text-slate-200">In Minutes</span>
-          </h1>
-          <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Professional device tracking service with military-grade security. 
-            Locate any Android or iOS device worldwide with pinpoint accuracy.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link href="/tracking">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg">
-                Start Tracking Now
-              </Button>
-            </Link>
-            <div className="flex items-center text-slate-400">
-              <CheckCircle className="w-5 h-5 mr-2 text-emerald-400" />
-              <span>30-second setup • No app required</span>
-            </div>
+      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl -z-10">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full" />
+        </div>
+
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Badge variant="outline" className="mb-6 py-1.5 px-4 rounded-full border-primary/20 bg-primary/5 text-primary text-xs font-semibold tracking-wider uppercase">
+                <Zap className="w-3 h-3 mr-2 fill-primary" />
+                Next-Gen Device Recovery
+              </Badge>
+              <h1 className="text-5xl lg:text-7xl font-bold leading-[1.1] mb-8">
+                Locate Any Device <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-emerald-400">With 99.8% Accuracy</span>
+              </h1>
+              <p className="text-xl text-slate-400 mb-10 leading-relaxed max-w-xl">
+                Track lost or stolen Android and iOS devices instantly. Our military-grade satellite integration provides real-time GPS coordinates anywhere in the world.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg" 
+                  className="h-14 px-8 rounded-full text-lg font-semibold bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20"
+                  onClick={() => handleTrackingClick("standard")}
+                >
+                  Start Tracking Now
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+                <div className="flex -space-x-3 items-center ml-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-[#0A0E1A] bg-slate-800 flex items-center justify-center overflow-hidden">
+                      <img src={`https://i.pravatar.cc/150?u=${i}`} alt="user" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                  <div className="pl-6">
+                    <div className="flex items-center text-yellow-500 mb-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-current" />)}
+                    </div>
+                    <div className="text-xs text-slate-400 font-medium">50k+ Happy Users</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent blur-3xl -z-10 rounded-full" />
+              <div className="relative rounded-3xl border border-white/5 bg-white/5 p-4 backdrop-blur-sm overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <img 
+                  src={heroImage} 
+                  alt="TrackIt Dashboard" 
+                  className="rounded-2xl w-full shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]"
+                />
+                
+                {/* Floating UI Elements */}
+                <div className="absolute top-10 right-10 bg-[#0A0E1A]/90 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-2xl">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Live Status</span>
+                  </div>
+                  <div className="text-sm font-semibold">Signal Strength: 100%</div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 border-y border-white/5 bg-white/[0.02]">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-slate-800/30 rounded-lg p-4 backdrop-blur-sm">
-                <stat.icon className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{stat.number}</div>
-                <div className="text-sm text-slate-400">{stat.label}</div>
+              <div key={index} className="text-center group">
+                <div className="mb-4 inline-flex w-12 h-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-primary group-hover:scale-110 transition-transform">
+                  <stat.icon size={24} />
+                </div>
+                <div className="text-3xl font-bold mb-1">{stat.number}</div>
+                <div className="text-sm text-slate-400 font-medium uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-slate-800/20 py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Why Choose TrackIt Now?</h2>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-              Professional-grade tracking technology trusted by security experts worldwide
-            </p>
+      {/* Features Grid */}
+      <section className="py-32">
+        <div className="container mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-4xl font-bold mb-6">Powerful Features for Peace of Mind</h2>
+            <p className="text-lg text-slate-400">Our platform combines cutting-edge satellite technology with an intuitive interface to help you recover your property faster.</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <Card key={index} className="bg-slate-800/40 border-slate-700/50 hover:bg-slate-800/60 transition-colors">
-                <CardContent className="p-6 text-center">
-                  <feature.icon className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2 text-white">{feature.title}</h3>
-                  <p className="text-slate-400">{feature.description}</p>
+              <Card key={index} className="bg-white/5 border-white/5 hover:border-primary/20 hover:bg-white/[0.08] transition-all duration-300 group rounded-3xl border-none">
+                <CardContent className="p-8">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 bg-${feature.color}-500/10 text-${feature.color}-400 group-hover:scale-110 transition-transform`}>
+                    <feature.icon size={28} />
+                  </div>
+                  <h3 className="text-xl font-bold mb-4 text-white">{feature.title}</h3>
+                  <p className="text-slate-400 leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -208,153 +266,219 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-white">Success Stories</h2>
-            <p className="text-xl text-slate-300">Real customers, real results</p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-slate-800/40 border-slate-700/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-slate-300 mb-4 italic">"{testimonial.comment}"</p>
-                  <div className="border-t border-slate-700 pt-4">
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-slate-400">{testimonial.location}</div>
-                    <div className="text-sm text-blue-400">{testimonial.device}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {/* Bento Grid Section */}
+      <section className="py-32 bg-white/[0.01]">
+        <div className="container mx-auto px-6">
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-[2.5rem] p-12 overflow-hidden relative group">
+              <div className="relative z-10">
+                <Badge className="mb-6 rounded-full bg-blue-500/20 text-blue-400 border-none px-4 py-1">Advanced Maps</Badge>
+                <h3 className="text-4xl font-bold mb-6 max-w-md">Precise Visualization with Interactive Maps</h3>
+                <p className="text-lg text-slate-400 max-w-sm mb-8">Get a bird's-eye view of your device's movement with our high-resolution mapping system.</p>
+                <Button variant="ghost" className="group/btn p-0 hover:bg-transparent text-primary">
+                  Learn more <ChevronRight className="ml-1 w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                </Button>
+              </div>
+              <div className="absolute bottom-[-10%] right-[-10%] w-[60%] opacity-20 group-hover:opacity-40 transition-opacity duration-700">
+                <Layout className="w-full h-full text-primary" />
+              </div>
+            </div>
+            
+            <div className="bg-primary border border-primary/20 rounded-[2.5rem] p-12 text-white relative overflow-hidden">
+              <div className="relative z-10">
+                <h3 className="text-3xl font-bold mb-6">Global Signal Network</h3>
+                <p className="text-blue-100 mb-8 leading-relaxed text-lg">Connect to over 400 satellites for instantaneous tracking coverage on all continents.</p>
+                <div className="pt-4 flex items-center space-x-2">
+                  {[1,2,3].map(i => <div key={i} className="w-2 h-2 rounded-full bg-white animate-pulse" style={{ animationDelay: `${i*0.2}s` }} />)}
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 w-full h-full opacity-10 pointer-events-none">
+                <Globe className="w-full h-full scale-150 rotate-12" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-emerald-600 py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4 text-white">Ready to Find Your Device?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust TrackIt Now for professional device recovery
+      {/* Pricing / CTA Section */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-primary/20 blur-[150px] -z-10 rounded-full" />
+        
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-5xl font-bold mb-8">Ready to Recover Your Device?</h2>
+          <p className="text-xl text-slate-400 mb-16 max-w-2xl mx-auto leading-relaxed">
+            Choose the tracking plan that fits your needs. Our standard and priority services both offer guaranteed results.
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button 
-              size="lg" 
-              variant="secondary" 
-              className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold w-full sm:w-auto"
-              onClick={() => handleTrackingClick("standard")}
-            >
-              Standard Tracking - $9.99
-            </Button>
-            <Button 
-              size="lg" 
-              className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto"
-              onClick={() => handleTrackingClick("priority")}
-            >
-              Fast Track Priority - $32.90
-            </Button>
-            {user && (
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => apiRequest("POST", "/api/logout").then(() => window.location.reload())}
-                className="w-full sm:w-auto"
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 text-left hover:bg-white/[0.08] transition-all flex flex-col">
+              <div className="mb-8">
+                <Badge className="bg-slate-800 text-slate-400 border-none mb-4">Standard Plan</Badge>
+                <div className="text-5xl font-bold mb-2">$9.99</div>
+                <div className="text-slate-400">One-time payment</div>
+              </div>
+              <ul className="space-y-4 mb-12 flex-1">
+                {['Single Device Access', 'Real-time Location', 'Standard Support', 'Location History'].map((item, i) => (
+                  <li key={i} className="flex items-center text-slate-300">
+                    <CheckCircle className="w-5 h-5 text-primary mr-3" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full h-14 rounded-2xl border-white/10 hover:bg-white/5"
+                onClick={() => handleTrackingClick("standard")}
               >
-                Logout ({user?.email})
+                Choose Standard
               </Button>
-            )}
-          </div>
+            </motion.div>
 
-          <Dialog open={showAuth} onOpenChange={setShowAuth}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{isLogin ? "Login for Premium" : "Sign Up for Premium"}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleAuth} className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <motion.div whileHover={{ y: -10 }} className="bg-gradient-to-br from-primary to-blue-600 rounded-[2.5rem] p-10 text-left relative overflow-hidden shadow-2xl shadow-primary/20 flex flex-col">
+              <div className="absolute top-0 right-0 p-8">
+                <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-widest">Most Popular</div>
+              </div>
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="mb-8">
+                  <Badge className="bg-white/20 text-white border-none mb-4">Priority Access</Badge>
+                  <div className="text-5xl font-bold mb-2 text-white">$32.90</div>
+                  <div className="text-blue-100">Priority tracking</div>
                 </div>
-                <div className="space-y-2">
-                  <Label>Password</Label>
-                  <Input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-                </div>
-                <Button type="submit" className="w-full">
-                  {isLogin ? "Login" : "Sign Up"}
+                <ul className="space-y-4 mb-12 flex-1">
+                  {['Unlimited Devices', 'Highest Accuracy Mode', '24/7 Priority Support', 'Automated Updates', 'Remote Lock/Wipe'].map((item, i) => (
+                    <li key={i} className="flex items-center text-white">
+                      <CheckCircle className="w-5 h-5 text-blue-200 mr-3" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  size="lg" 
+                  className="w-full h-14 rounded-2xl bg-white text-primary hover:bg-slate-100 font-bold"
+                  onClick={() => handleTrackingClick("priority")}
+                >
+                  Get Started Now
                 </Button>
-                <Button variant="ghost" className="w-full" onClick={() => setIsLogin(!isLogin)}>
-                  {isLogin ? "Need an account? Sign up" : "Have an account? Login"}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+      <footer className="pt-20 pb-10 border-t border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-12 mb-20">
+            <div className="col-span-2 lg:col-span-1">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <Satellite className="text-white" size={16} />
                 </div>
-                <span className="text-xl font-bold text-white">TrackIt Now</span>
+                <span className="text-lg font-bold">TrackIt Now</span>
               </div>
-              <p className="text-slate-400">Professional device tracking services worldwide.</p>
+              <p className="text-slate-400 max-w-xs leading-relaxed">
+                Empowering individuals with advanced satellite technology to secure and recover their digital life.
+              </p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <div className="space-y-2 text-slate-400">
-                <Link href="/privacy" className="block hover:text-white transition-colors">Privacy Policy</Link>
-                <Link href="/terms" className="block hover:text-white transition-colors">Terms of Service</Link>
-                <Link href="/gdpr" className="block hover:text-white transition-colors">GDPR Compliance</Link>
-              </div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-slate-500">Service</h4>
+              <ul className="space-y-4 text-slate-400 text-sm">
+                <li><a href="#" className="hover:text-primary transition-colors">Pricing Plans</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Global Coverage</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">Security Standards</a></li>
+              </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold text-white mb-4">Security</h4>
-              <div className="space-y-2 text-slate-400">
-                <div className="flex items-center">
-                  <Shield className="w-4 h-4 mr-2 text-green-400" />
-                  <span>256-bit SSL Encryption</span>
-                </div>
-                <div className="flex items-center">
-                  <Lock className="w-4 h-4 mr-2 text-green-400" />
-                  <span>GDPR Compliant</span>
-                </div>
-                <div className="flex items-center">
-                  <Award className="w-4 h-4 mr-2 text-green-400" />
-                  <span>ISO 27001 Certified</span>
-                </div>
-              </div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-slate-500">Legal</h4>
+              <ul className="space-y-4 text-slate-400 text-sm">
+                <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                <li><a href="#" className="hover:text-primary transition-colors">GDPR</a></li>
+              </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold text-white mb-4">Contact</h4>
-              <div className="space-y-2 text-slate-400">
-                <div>24/7 Support Available</div>
-                <div>support@trackitnow.com</div>
-                <div>Response time: &lt; 1 hour</div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-slate-500">Support</h4>
+              <div className="text-sm text-slate-400 leading-relaxed mb-6">
+                24/7 technical support is available for all users.
               </div>
+              <Button variant="outline" className="w-full border-white/10 rounded-xl text-xs uppercase tracking-widest">Contact Support</Button>
             </div>
           </div>
           
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2024 TrackIt Now. All rights reserved. Professional device tracking services.</p>
+          <div className="pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
+            <p className="text-xs text-slate-500 font-medium tracking-wide italic">
+              Military-grade device tracking technology &copy; 2024 TrackIt Now. All rights reserved.
+            </p>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-center space-x-2 grayscale opacity-50">
+                <Shield className="w-4 h-4" />
+                <span className="text-[10px] font-bold">SSL SECURED</span>
+              </div>
+              <div className="flex items-center space-x-2 grayscale opacity-50">
+                <Lock className="w-4 h-4" />
+                <span className="text-[10px] font-bold">GDPR COMPLIANT</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
+
+      {/* Auth Dialog */}
+      <Dialog open={showAuth} onOpenChange={setShowAuth}>
+        <DialogContent className="sm:max-w-md bg-[#0A0E1A] border-white/10 rounded-[2rem] p-0 overflow-hidden shadow-2xl">
+          <div className="relative p-10">
+            <div className="absolute top-0 right-0 p-10 opacity-10">
+              <MousePointer2 className="w-24 h-24 rotate-12" />
+            </div>
+            <DialogHeader className="mb-8">
+              <DialogTitle className="text-3xl font-bold tracking-tight">
+                {isLogin ? "Welcome Back" : "Create Account"}
+              </DialogTitle>
+              <p className="text-slate-400 pt-2">Enter your credentials to access tracking services.</p>
+            </DialogHeader>
+            <form onSubmit={handleAuth} className="space-y-6">
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Email Address</Label>
+                <Input 
+                  type="email" 
+                  value={email} 
+                  onChange={e => setEmail(e.target.value)} 
+                  required 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary"
+                  placeholder="name@company.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Password</Label>
+                <Input 
+                  type="password" 
+                  value={password} 
+                  onChange={e => setPassword(e.target.value)} 
+                  required 
+                  className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary"
+                  placeholder="••••••••"
+                />
+              </div>
+              <Button type="submit" className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
+                {isLogin ? "Continue Tracking" : "Sign Up Now"}
+              </Button>
+              <div className="text-center">
+                <button 
+                  type="button"
+                  className="text-sm font-medium text-slate-500 hover:text-white transition-colors"
+                  onClick={() => setIsLogin(!isLogin)}
+                >
+                  {isLogin ? "Don't have an account? Create one" : "Already have an account? Sign in"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

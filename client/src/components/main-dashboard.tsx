@@ -1,5 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useEffect, useRef, useState } from "react";
 import { 
   MapPin, 
@@ -12,10 +13,14 @@ import {
   Bot,
   Battery,
   Signal,
-  LockKeyhole
+  LockKeyhole,
+  Activity,
+  Navigation2,
+  ShieldAlert
 } from "lucide-react";
 import { mockDeviceInfo, generateLomeLocation } from "@/lib/device-data";
 import { ActivityEntry, createActivityEntry } from "@/lib/tracking-utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MainDashboardProps {
   isVisible: boolean;
@@ -24,7 +29,7 @@ interface MainDashboardProps {
 export function MainDashboard({ isVisible }: MainDashboardProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [currentLocation, setCurrentLocation] = useState(generateLomeLocation());
-  const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); // Latitude change for ~100m north
+  const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); 
   const [activities, setActivities] = useState<ActivityEntry[]>([
     createActivityEntry('Identifier accepted', 'success'),
     createActivityEntry('Location found - Lomé, Togo', 'info'),
@@ -33,39 +38,24 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   const [isPriority, setIsPriority] = useState(false);
 
   useEffect(() => {
-    // Check if the current purchase is priority
-    const checkTrackingType = async () => {
-      try {
-        // We need the IMEI to check status, but it's not passed here. 
-        // For simulation, we'll check the URL or a global state if available.
-        // As a fallback, we'll look at the last purchase in session storage or similar.
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('fast') === 'true') {
-          setIsPriority(true);
-        }
-      } catch (e) {
-        console.error("Error checking tracking type", e);
-      }
-    };
-    checkTrackingType();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('fast') === 'true') {
+      setIsPriority(true);
+    }
   }, []);
 
   useEffect(() => {
     if (!isVisible || !isPriority) return;
 
-    // Simulate movement every 5 seconds only for priority
     const moveInterval = setInterval(() => {
       setCurrentLocation(prev => {
         const newLat = prev[0] + direction[0];
         const newLng = prev[1] + direction[1];
         
-        // Add activity for movement
         addActivity('Device moving - tracking update', 'info');
 
-        // Proximity alert simulation
         if (Math.random() > 0.7) {
           addActivity('Proximity Alert: Target entered secure perimeter', 'warning');
-          // Simple beep sound effect if supported by browser
           try {
             const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
@@ -86,7 +76,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info') => {
     const newActivity = createActivityEntry(message, type);
-    setActivities(prev => [newActivity, ...prev.slice(0, 9)]); // Keep only last 10
+    setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
   };
 
   const executeAction = (action: string) => {
@@ -105,36 +95,29 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     addActivity(messages[action as keyof typeof messages], types[action]);
   };
 
-  const refreshLocation = () => {
-    const newLocation = generateLomeLocation();
-    setCurrentLocation(newLocation);
-    addActivity('Location refreshed - Lomé, Togo', 'info');
-  };
-
   useEffect(() => {
     if (!isVisible || !mapRef.current) return;
 
-    // Initialize Leaflet map
     const L = (window as any).L;
     if (!L) return;
 
-    const map = L.map(mapRef.current).setView(currentLocation, 13);
+    const map = L.map(mapRef.current, {
+      zoomControl: false,
+      attributionControl: false
+    }).setView(currentLocation, 13);
     
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 20
     }).addTo(map);
 
-    // Add device marker
     const deviceIcon = L.divIcon({
-      html: '<div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse"><div class="w-3 h-3 bg-white rounded-full"></div></div>',
-      iconSize: [24, 24],
+      html: '<div class="relative w-10 h-10 flex items-center justify-center"><div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div><div class="relative w-4 h-4 bg-primary rounded-full border-2 border-white shadow-lg"></div></div>',
+      iconSize: [40, 40],
       className: 'device-marker'
     });
 
     L.marker(currentLocation, { icon: deviceIcon })
-      .addTo(map)
-      .bindPopup(`Device Location<br>Battery: ${mockDeviceInfo.battery}<br>Last seen: 2 minutes ago`)
-      .openPopup();
+      .addTo(map);
 
     return () => {
       map.remove();
@@ -144,160 +127,157 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   if (!isVisible) return null;
 
   return (
-    <div className="animate-in slide-in-from-bottom-5 duration-300">
-      <div className="grid lg:grid-cols-3 gap-8 mb-8">
-        
-        {/* Map Section */}
-        <div className="lg:col-span-2">
-          <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold flex items-center">
-                  <MapPin className="text-emerald-400 mr-3 animate-pulse" size={24} />
-                  Live Location
-                </h2>
-              </div>
-              
-              <div 
-                ref={mapRef}
-                className="h-80 rounded-lg border border-slate-600 bg-slate-700"
-              />
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                <div className="bg-slate-700/50 rounded-lg p-3 text-center">
-                  <MapPin className="text-emerald-400 mb-1 mx-auto" size={16} />
-                  <p className="text-xs text-slate-400">Location</p>
-                  <p className="font-semibold">Lomé, TG</p>
-                </div>
-                <div className="bg-slate-700/50 rounded-lg p-3 text-center">
-                  <Battery className="text-amber-400 mb-1 mx-auto" size={16} />
-                  <p className="text-xs text-slate-400">Battery</p>
-                  <p className="font-semibold">{mockDeviceInfo.battery}</p>
-                </div>
-                <div className="bg-slate-700/50 rounded-lg p-3 text-center">
-                  <Signal className="text-blue-400 mb-1 mx-auto" size={16} />
-                  <p className="text-xs text-slate-400">Network</p>
-                  <p className="font-semibold">{mockDeviceInfo.network}</p>
-                </div>
-                <div className="bg-slate-700/50 rounded-lg p-3 text-center">
-                  <LockKeyhole className="text-red-400 mb-1 mx-auto" size={16} />
-                  <p className="text-xs text-slate-400">Status</p>
-                  <p className="font-semibold">{mockDeviceInfo.lockStatus}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+    <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center space-x-3 mb-2">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-none px-3">Live Tracking</Badge>
+            {isPriority && <Badge className="bg-primary/20 text-primary border-none px-3">Fast Track Priority</Badge>}
+          </div>
+          <h2 className="text-3xl font-bold tracking-tight">Tracking Terminal</h2>
         </div>
-        
-        {/* Control Panel */}
-        <div className="space-y-6">
-          {/* Device Actions */}
-          <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center">
-                <Settings className="text-blue-400 mr-3" size={20} />
-                Device Actions
-              </h3>
-              
-              <div className="space-y-3">
-                <Button 
-                  onClick={() => executeAction('ring')}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 flex items-center justify-center"
-                >
-                  <Volume2 className="mr-2" size={16} />
-                  Make Ring
-                </Button>
-                
-                <Button 
-                  onClick={() => executeAction('lock')}
-                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-4 flex items-center justify-center"
-                >
-                  <Lock className="mr-2" size={16} />
-                  Remote Lock
-                </Button>
-                
-                <Button 
-                  onClick={() => executeAction('wipe')}
-                  className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 flex items-center justify-center"
-                >
-                  <Trash2 className="mr-2" size={16} />
-                  Wipe Data
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Activity Timeline */}
-          <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-bold mb-4 flex items-center">
-                <History className="text-blue-400 mr-3" size={20} />
-                Activity Journal
-              </h3>
-              
-              <div className="space-y-3 max-h-64 overflow-y-auto">
-                {activities.map((activity) => {
-                  const colors = {
-                    success: 'bg-emerald-400',
-                    error: 'bg-red-400',
-                    warning: 'bg-amber-400',
-                    info: 'bg-blue-400'
-                  };
-
-                  return (
-                    <div key={activity.id} className="flex items-start space-x-3 animate-in fade-in-0 duration-300">
-                      <div className={`w-2 h-2 ${colors[activity.type]} rounded-full mt-2`}></div>
-                      <div>
-                        <p className="text-sm font-medium">{activity.time} - {activity.message}</p>
-                        <p className="text-xs text-slate-400">Real-time update</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex items-center space-x-3">
+          <Button variant="outline" size="sm" className="rounded-xl border-white/10 bg-white/5 h-10">
+            <History className="w-4 h-4 mr-2" />
+            Full History
+          </Button>
+          <Button variant="outline" size="sm" className="rounded-xl border-white/10 bg-white/5 h-10">
+            <Navigation2 className="w-4 h-4 mr-2" />
+            Route Plans
+          </Button>
         </div>
       </div>
 
-      {/* AI Assistant */}
-      <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-        <CardContent className="p-6">
-          <h3 className="text-lg font-bold mb-4 flex items-center">
-            <Bot className="text-blue-400 mr-3" size={20} />
-            AI Assistant
-          </h3>
-          
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center animate-pulse">
-              <Bot className="text-white" size={24} />
-            </div>
-            <div className="flex-1 bg-slate-700/50 rounded-lg p-4">
-              <p className="text-sm">
-                "I'm searching for the phone... Position found near Lomé, Togo. 
-                Battery is low at {mockDeviceInfo.battery}. The device is currently {mockDeviceInfo.lockStatus.toLowerCase()}. 
-                Would you like me to make it ring?"
-              </p>
-              <div className="flex space-x-2 mt-3">
-                <Button 
-                  size="sm"
-                  onClick={() => executeAction('ring')}
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1"
-                >
-                  Yes, Ring It
-                </Button>
-                <Button 
-                  size="sm"
-                  variant="outline"
-                  className="bg-slate-600 hover:bg-slate-500 text-white text-xs px-3 py-1 border-slate-500"
-                >
-                  Not Now
-                </Button>
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          {/* Map Card */}
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/50 to-emerald-500/50 rounded-[2.5rem] blur opacity-20 group-hover:opacity-30 transition duration-1000"></div>
+            <Card className="relative bg-[#0A0E1A] border-white/5 rounded-[2.5rem] overflow-hidden">
+              <CardContent className="p-0">
+                <div 
+                  ref={mapRef}
+                  className="h-[500px] w-full grayscale-[0.5] contrast-[1.2]"
+                />
+                
+                {/* Floating Map Stats */}
+                <div className="absolute bottom-6 left-6 right-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { label: 'Battery', value: mockDeviceInfo.battery, icon: Battery, color: 'emerald' },
+                    { label: 'Network', value: mockDeviceInfo.network, icon: Signal, color: 'blue' },
+                    { label: 'Status', value: mockDeviceInfo.lockStatus, icon: LockKeyhole, color: 'amber' },
+                    { label: 'Signal', value: 'Excellent', icon: Activity, color: 'primary' }
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center space-x-3 shadow-2xl">
+                      <div className={`w-8 h-8 rounded-lg bg-${stat.color}-500/10 text-${stat.color}-400 flex items-center justify-center shrink-0`}>
+                        <stat.icon size={16} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 truncate">{stat.label}</p>
+                        <p className="text-sm font-bold truncate">{stat.value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* AI Insights */}
+          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8">
+            <div className="flex items-start space-x-6">
+              <div className="w-16 h-16 rounded-[1.5rem] bg-primary/20 flex items-center justify-center text-primary shrink-0 animate-pulse">
+                <Bot size={32} />
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <h3 className="font-bold text-lg">Predictive Assistant</h3>
+                  <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest border-primary/20 text-primary">Active</Badge>
+                </div>
+                <p className="text-slate-400 leading-relaxed text-lg italic">
+                  "Target device is currently stationary at a residence in Lomé. Signal stability is optimal. Battery levels suggest approximately 4 hours of operation remaining. Recommend enabling remote lock if the device is not in a safe zone."
+                </p>
+                <div className="flex items-center space-x-4">
+                  <Button variant="default" size="sm" className="rounded-xl h-10 px-6 font-bold bg-primary hover:bg-primary/90" onClick={() => executeAction('lock')}>
+                    Confirm Remote Lock
+                  </Button>
+                  <Button variant="ghost" size="sm" className="rounded-xl h-10 px-6 text-slate-400 hover:text-white hover:bg-white/5">
+                    Ignore Recommendation
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </Card>
+        </div>
+
+        <div className="space-y-8">
+          {/* Action Center */}
+          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8">
+            <h3 className="text-xl font-bold mb-8 flex items-center">
+              <Settings className="text-primary mr-3" size={24} />
+              Action Center
+            </h3>
+            
+            <div className="space-y-4">
+              {[
+                { id: 'ring', name: 'Emergency Alarm', desc: 'Trigger maximum volume ring', icon: Volume2, color: 'emerald' },
+                { id: 'lock', name: 'Secure Lock', desc: 'Lock with custom message', icon: Lock, color: 'amber' },
+                { id: 'wipe', name: 'Nuclear Wipe', desc: 'Irreversible data erasure', icon: Trash2, color: 'red' }
+              ].map((action) => (
+                <button
+                  key={action.id}
+                  onClick={() => executeAction(action.id)}
+                  className="w-full group text-left p-4 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.05] transition-all duration-300 flex items-center space-x-4"
+                >
+                  <div className={`w-12 h-12 rounded-2xl bg-${action.color}-500/10 text-${action.color}-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0`}>
+                    <action.icon size={20} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-sm truncate">{action.name}</h4>
+                    <p className="text-xs text-slate-500 truncate">{action.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </Card>
+
+          {/* Activity Log */}
+          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8 h-[400px] flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-xl font-bold flex items-center">
+                <History className="text-primary mr-3" size={24} />
+                Terminal Logs
+              </h3>
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
+            
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="space-y-6">
+                <AnimatePresence initial={false}>
+                  {activities.map((activity) => (
+                    <motion.div
+                      key={activity.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-start space-x-4"
+                    >
+                      <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${
+                        activity.type === 'success' ? 'bg-emerald-500' :
+                        activity.type === 'error' ? 'bg-red-500' :
+                        activity.type === 'warning' ? 'bg-amber-500' : 'bg-primary'
+                      }`} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium leading-tight">{activity.message}</p>
+                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">{activity.time}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </ScrollArea>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

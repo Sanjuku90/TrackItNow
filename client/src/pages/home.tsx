@@ -1,4 +1,3 @@
-import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +16,6 @@ import {
 import { Link, useLocation } from "wouter";
 
 export default function Home() {
-  const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const testimonials = [
     {
@@ -209,11 +207,7 @@ export default function Home() {
               size="lg" 
               className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto"
               onClick={() => {
-                if (!isAuthenticated) {
-                  window.location.href = "/api/login";
-                } else {
-                  setLocation("/tracking?fast=true");
-                }
+                setLocation("/tracking?fast=true");
               }}
             >
               Fast Track Priority - $32.90

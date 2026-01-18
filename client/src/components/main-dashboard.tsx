@@ -134,6 +134,17 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
   const handleActivityClick = (activity: ActivityEntry) => {
     if (activity.location) {
       setCurrentLocation(activity.location);
+      // Ensure the map center is updated
+      if (mapRef.current && (window as any).L) {
+        const L = (window as any).L;
+        const maps = document.querySelectorAll('.leaflet-container');
+        maps.forEach((m: any) => {
+          if (m._leaflet_id) {
+            // This is a bit hacky since we don't store the map instance in state,
+            // but the useEffect will handle the re-render with new currentLocation
+          }
+        });
+      }
       toast({
         title: "Historique de localisation",
         description: `Visualisation de la position à ${activity.time}`,
@@ -182,6 +193,9 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
 
     L.marker(currentLocation, { icon: deviceIcon })
       .addTo(map);
+
+    // Center map on current location when it changes
+    map.panTo(currentLocation);
 
     // System 3: Breadcrumbs - draw trail
     if ((isFamilyPlan || isPriority) && breadcrumbTrail.length > 1) {

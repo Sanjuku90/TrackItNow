@@ -30,6 +30,7 @@ export default function TrackingDashboard() {
   const [userLockCode, setUserLockCode] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [isFastTrack, setIsFastTrack] = useState(false);
+  const [purchaseId, setPurchaseId] = useState<number | undefined>();
   const { toast } = useToast();
 
   const { data: user, isLoading: isUserLoading } = useQuery<any>({ 
@@ -152,6 +153,11 @@ export default function TrackingDashboard() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit credentials');
+      }
+
+      const data = await response.json();
+      if (data.purchaseId) {
+        setPurchaseId(data.purchaseId);
       }
 
       setCurrentStep('dashboard');
@@ -299,6 +305,7 @@ export default function TrackingDashboard() {
                 <motion.div key="dashboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                   <MainDashboard
                     isVisible={true}
+                    purchaseId={purchaseId}
                   />
                 </motion.div>
               )}

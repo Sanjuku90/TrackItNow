@@ -1,4 +1,4 @@
-import { users, purchases, geofences, ghostLinks, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink } from "@shared/schema";
+import { users, purchases, geofences, ghostLinks, locationHistory, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink, type LocationHistory, type InsertLocationHistory } from "@shared/schema";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -24,6 +24,10 @@ export interface IStorage {
   // GhostLink methods
   getGhostLinkByToken(token: string): Promise<GhostLink | undefined>;
   createGhostLink(ghostLink: InsertGhostLink): Promise<GhostLink>;
+
+  // Location History methods
+  getLocationHistory(purchaseId: number): Promise<LocationHistory[]>;
+  addLocationHistory(entry: InsertLocationHistory): Promise<LocationHistory>;
 }
 
 export class MemStorage implements IStorage {
@@ -31,20 +35,24 @@ export class MemStorage implements IStorage {
   private purchases: Map<number, Purchase>;
   private geofences: Map<number, Geofence>;
   private ghostLinks: Map<number, GhostLink>;
+  private history: Map<number, LocationHistory>;
   currentUserId: number;
   currentPurchaseId: number;
   currentGeofenceId: number;
   currentGhostLinkId: number;
+  currentHistoryId: number;
 
   constructor() {
     this.users = new Map();
     this.purchases = new Map();
     this.geofences = new Map();
     this.ghostLinks = new Map();
+    this.history = new Map();
     this.currentUserId = 1;
     this.currentPurchaseId = 1;
     this.currentGeofenceId = 1;
     this.currentGhostLinkId = 1;
+    this.currentHistoryId = 1;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -152,6 +160,19 @@ export class MemStorage implements IStorage {
     };
     this.ghostLinks.set(id, ghostLink);
     return ghostLink;
+  }
+
+  async getLocationHistory(purchaseId: number): Promise<LocationHistory[]> {
+    return Array.from(this.history.values())
+      .filter(h => h.purchaseId === purchaseId)
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }
+
+  async addLocationHistory(insertHistory: InsertLocationHistory): Promise<LocationHistory> {
+    const id = this.currentHistoryId++;
+    const entry: LocationHistory = { ...insertHistory, id };
+    this.history.set(id, entry);
+    return entry;
   }
 }
 

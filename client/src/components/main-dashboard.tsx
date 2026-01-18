@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { 
   MapPin, 
   RefreshCw, 
@@ -27,42 +28,44 @@ import {
 import { mockDeviceInfo, generateLomeLocation } from "@/lib/device-data";
 import { ActivityEntry, createActivityEntry } from "@/lib/tracking-utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { LocationHistory } from "@shared/schema";
 
 interface MainDashboardProps {
   isVisible: boolean;
+  purchaseId?: number;
 }
 
-export function MainDashboard({ isVisible }: MainDashboardProps) {
+export function MainDashboard({ isVisible, purchaseId }: MainDashboardProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [currentLocation, setCurrentLocation] = useState<[number, number]>(() => {
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
     if (id) {
-      // Mock historical data based on ID for demo
-      // In production this would come from the database
       return [6.1375 + (parseInt(id.split('-')[1]) % 100) * 0.0001, 1.2125 + (parseInt(id.split('-')[1]) % 100) * 0.0001];
     }
     return generateLomeLocation();
   });
-  const [direction, setDirection] = useState<[number, number]>([0.0009, 0]); 
-  const [activities, setActivities] = useState<ActivityEntry[]>(() => {
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
-    if (id) {
-      return [
-        createActivityEntry(`Historique récupéré pour ${id}`, 'success'),
-        createActivityEntry('Dernière position connue affichée', 'info')
-      ];
-    }
-    // No hardcoded activities for new sessions
-    return [];
+
+  const { data: history } = useQuery<LocationHistory[]>({
+    queryKey: [`/api/purchases/${purchaseId}/history`],
+    enabled: !!purchaseId && isVisible
   });
+
+  const [activities, setActivities] = useState<ActivityEntry[]>([]);
   const [isPriority, setIsPriority] = useState(false);
   const [geofences, setGeofences] = useState<{name: string, lat: number, lng: number, radius: number}[]>([]);
-  const [breadcrumbTrail, setBreadcrumbTrail] = useState<[number, number][]>([]);
   const [isReviewMode, setIsReviewMode] = useState(() => {
     return new URLSearchParams(window.location.search).has('id');
   });
+
+  useEffect(() => {
+    if (history && history.length > 0) {
+      const historyActivities = history.map(h => 
+        createActivityEntry(`Position enregistrée`, 'info', [parseFloat(h.lat), parseFloat(h.lng)])
+      );
+      setActivities(prev => [...historyActivities, ...prev].slice(0, 20));
+    }
+  }, [history]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -202,14 +205,28 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     // Center map on current location when it changes
     map.panTo(currentLocation);
 
-    // System 3: Breadcrumbs - draw trail
-    if (isPriority && breadcrumbTrail.length > 1) {
-      L.polyline(breadcrumbTrail, {
-        color: '#3b82f6',
+    // Draw history trail
+    if (history && history.length > 1) {
+      const pathCoords = history.map(h => [parseFloat(h.lat), parseFloat(h.lng)] as [number, number]);
+      L.polyline(pathCoords, {
+        color: '#10b981',
         weight: 3,
-        opacity: 0.5,
-        dashArray: '5, 10'
+        opacity: 0.6,
+        dashArray: '10, 10'
       }).addTo(map);
+
+      // Add small markers for history points
+      pathCoords.forEach((coord, i) => {
+        if (i === pathCoords.length - 1) return; // Skip last one (current)
+        L.circleMarker(coord, {
+          radius: 4,
+          fillColor: '#10b981',
+          color: '#fff',
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        }).addTo(map);
+      });
     }
 
     return () => {

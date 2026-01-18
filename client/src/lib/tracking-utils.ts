@@ -19,13 +19,19 @@ export interface ActivityEntry {
   time: string;
   message: string;
   type: 'success' | 'error' | 'warning' | 'info';
+  location?: [number, number];
 }
 
-export function createActivityEntry(message: string, type: ActivityEntry['type'] = 'info'): ActivityEntry {
+export function createActivityEntry(
+  message: string, 
+  type: ActivityEntry['type'] = 'info',
+  location?: [number, number]
+): ActivityEntry {
   return {
     id: Math.random().toString(36).substr(2, 9),
     time: getCurrentTime(),
     message,
-    type
+    type,
+    location
   };
 }

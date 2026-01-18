@@ -92,7 +92,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
-        addActivity('Device moving - tracking update', 'info');
+        addActivity('Device moving - tracking update', 'info', [newLat, newLng]);
         
         // System 1 & 4: Geofencing & Check-in
         if (isFamilyPlan) {
@@ -126,9 +126,19 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     return () => clearInterval(moveInterval);
   }, [isVisible, isPriority, isFamilyPlan, direction, geofences]);
 
-  const addActivity = (message: string, type: ActivityEntry['type'] = 'info') => {
-    const newActivity = createActivityEntry(message, type);
+  const addActivity = (message: string, type: ActivityEntry['type'] = 'info', location?: [number, number]) => {
+    const newActivity = createActivityEntry(message, type, location);
     setActivities(prev => [newActivity, ...prev.slice(0, 9)]);
+  };
+
+  const handleActivityClick = (activity: ActivityEntry) => {
+    if (activity.location) {
+      setCurrentLocation(activity.location);
+      toast({
+        title: "Historique de localisation",
+        description: `Visualisation de la position à ${activity.time}`,
+      });
+    }
   };
 
   const executeAction = (action: string) => {
@@ -386,13 +396,15 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                       key={activity.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="group"
+                      className={`group p-2 rounded-xl transition-colors ${activity.location ? 'cursor-pointer hover:bg-white/5' : ''}`}
+                      onClick={() => handleActivityClick(activity)}
                     >
                       <div className="flex items-center justify-between mb-1">
                         <p className={`text-xs sm:text-sm font-medium ${
                           activity.type === 'warning' ? 'text-amber-400' : 'text-slate-200'
                         }`}>
                           {activity.message}
+                          {activity.location && <MapPin size={12} className="inline ml-2 text-primary/60" />}
                         </p>
                         {activity.type === 'warning' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />}
                       </div>

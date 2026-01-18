@@ -17,9 +17,26 @@ export const purchases = pgTable("purchases", {
   amount: integer("amount").notNull(),
   status: text("status", { enum: ["pending", "validated", "rejected", "suspended"] }).notNull().default("pending"),
   userEmail: text("user_email").notNull(),
-  trackingType: text("tracking_type", { enum: ["standard", "priority"] }).notNull().default("standard"),
+  trackingType: text("tracking_type", { enum: ["standard", "priority", "family", "temporary"] }).notNull().default("standard"),
   lastTrackingUpdate: text("last_tracking_update"),
 });
+
+export const geofences = pgTable("geofences", {
+  id: serial("id").primaryKey(),
+  purchaseId: integer("purchase_id").references(() => purchases.id),
+  name: text("name").notNull(),
+  centerLat: text("center_lat").notNull(),
+  centerLng: text("center_lng").notNull(),
+  radius: integer("radius").notNull(), // meters
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const insertGeofenceSchema = createInsertSchema(geofences).omit({
+  id: true,
+});
+
+export type Geofence = typeof geofences.$inferSelect;
+export type InsertGeofence = z.infer<typeof insertGeofenceSchema>;
 
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,

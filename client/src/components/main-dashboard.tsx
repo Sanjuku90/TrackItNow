@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
 import { 
   MapPin, 
@@ -16,7 +17,10 @@ import {
   LockKeyhole,
   Activity,
   Navigation2,
-  ShieldAlert
+  ShieldAlert,
+  Users,
+  Share2,
+  Ghost
 } from "lucide-react";
 import { mockDeviceInfo, generateLomeLocation } from "@/lib/device-data";
 import { ActivityEntry, createActivityEntry } from "@/lib/tracking-utils";
@@ -36,23 +40,57 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     createActivityEntry('Device locked remotely', 'warning')
   ]);
   const [isPriority, setIsPriority] = useState(false);
+  const [isFamilyPlan, setIsFamilyPlan] = useState(false);
+  const [isGhostLink, setIsGhostLink] = useState(false);
+  const [geofences, setGeofences] = useState<{name: string, lat: number, lng: number, radius: number}[]>([]);
+  const [breadcrumbTrail, setBreadcrumbTrail] = useState<[number, number][]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('fast') === 'true') {
       setIsPriority(true);
     }
+    
+    // Check for specific plans
+    if (params.get('plan') === 'family') {
+      setIsFamilyPlan(true);
+      setGeofences([
+        { name: "Maison", lat: currentLocation[0], lng: currentLocation[1], radius: 200 },
+        { name: "École", lat: currentLocation[0] + 0.005, lng: currentLocation[1] + 0.005, radius: 300 }
+      ]);
+    }
+    
+    if (params.get('plan') === 'temporary') {
+      setIsGhostLink(true);
+    }
   }, []);
 
   useEffect(() => {
-    if (!isVisible || !isPriority) return;
-
+    if (!isVisible) return;
+    
     const moveInterval = setInterval(() => {
       setCurrentLocation(prev => {
         const newLat = prev[0] + direction[0];
         const newLng = prev[1] + direction[1];
         
+        // System 3: Breadcrumbs - store trail if family plan or priority
+        if (isFamilyPlan || isPriority) {
+          setBreadcrumbTrail(trail => [...trail, [newLat, newLng]].slice(-20));
+        }
+
         addActivity('Device moving - tracking update', 'info');
+        
+        // System 1 & 4: Geofencing & Check-in
+        if (isFamilyPlan) {
+          geofences.forEach(gf => {
+            const dist = Math.sqrt(Math.pow(newLat - gf.lat, 2) + Math.pow(newLng - gf.lng, 2)) * 111000;
+            if (dist > gf.radius && Math.random() > 0.8) {
+              addActivity(`ALERTE: Sortie de zone - ${gf.name}`, 'error');
+            } else if (dist < 50 && Math.random() > 0.9) {
+              addActivity(`CHECK-IN: Arrivé à ${gf.name}`, 'success');
+            }
+          });
+        }
 
         if (Math.random() > 0.7) {
           addActivity('Proximity Alert: Target entered secure perimeter', 'warning');
@@ -69,10 +107,10 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         
         return [newLat, newLng] as [number, number];
       });
-    }, 5000);
+    }, isPriority ? 3000 : 5000);
 
     return () => clearInterval(moveInterval);
-  }, [isVisible, isPriority, direction]);
+  }, [isVisible, isPriority, isFamilyPlan, direction, geofences]);
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info') => {
     const newActivity = createActivityEntry(message, type);
@@ -119,10 +157,28 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     L.marker(currentLocation, { icon: deviceIcon })
       .addTo(map);
 
+    if (isFamilyPlan) {
+      geofences.forEach(gf => {
+        L.circle([gf.lat, gf.lng], {
+          color: '#3b82f6',
+          fillColor: '#3b82f6',
+          fillOpacity: 0.1,
+          radius: gf.radius
+        }).addTo(map);
+
+        L.marker([gf.lat, gf.lng], {
+          icon: L.divIcon({
+            html: `<div class="bg-blue-500/20 p-1 rounded-full border border-blue-500/50"><div class="w-2 h-2 bg-blue-500 rounded-full"></div></div>`,
+            className: 'geofence-marker'
+          })
+        }).addTo(map).bindPopup(gf.name);
+      });
+    }
+
     return () => {
       map.remove();
     };
-  }, [isVisible, currentLocation]);
+  }, [isVisible, currentLocation, isFamilyPlan, geofences]);
 
   if (!isVisible) return null;
 
@@ -133,6 +189,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           <div className="flex items-center space-x-3 mb-2">
             <Badge className="bg-emerald-500/20 text-emerald-400 border-none px-3">Live Tracking</Badge>
             {isPriority && <Badge className="bg-primary/20 text-primary border-none px-3">Fast Track Priority</Badge>}
+            {isFamilyPlan && <Badge className="bg-blue-500/20 text-blue-400 border-none px-3 flex items-center gap-1"><Users size={12}/> Family Circle</Badge>}
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Tracking Terminal</h2>
         </div>

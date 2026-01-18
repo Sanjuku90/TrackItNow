@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/use-theme";
 import Home from "@/pages/home";
 import TrackingDashboard from "@/pages/tracking-dashboard";
+import UserDashboard from "@/pages/user-dashboard";
 import AdminDashboard from "@/pages/admin";
 import Privacy from "@/pages/privacy";
 import Terms from "@/pages/terms";
@@ -15,6 +16,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/dashboard" component={UserDashboard} />
       <Route path="/tracking" component={TrackingDashboard} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/privacy" component={Privacy} />

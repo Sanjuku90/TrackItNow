@@ -258,8 +258,8 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                 <div className="absolute top-4 left-4 right-4 sm:top-6 sm:left-6 sm:right-6 flex justify-between items-start pointer-events-none">
                   <div className="flex flex-col gap-2 sm:gap-3">
                     {[
-                      { label: 'Battery', value: '36%', icon: Battery, color: 'emerald' },
-                      { label: 'Status', value: 'Locked', icon: LockKeyhole, color: 'white' }
+                      { label: 'Status', value: 'Locked', icon: LockKeyhole, color: 'white' },
+                      { label: 'Pulse', value: 'Active', icon: Activity, color: 'white' }
                     ].map((stat, i) => (
                       <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-2 sm:p-3 pr-4 sm:pr-6 rounded-xl sm:rounded-2xl flex items-center space-x-2 sm:space-x-3 shadow-2xl pointer-events-auto">
                         <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${stat.color === 'emerald' ? 'text-emerald-400' : 'text-white'}`}>
@@ -276,7 +276,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                   <div className="flex flex-col gap-2 sm:gap-3 items-end">
                     {[
                       { label: 'Signal', value: 'Excellent', icon: Signal, color: 'blue' },
-                      { label: 'Pulse', value: 'Active', icon: Activity, color: 'white' }
+                      { label: 'Network', value: 'MTN 4G', icon: Radio, color: 'white' }
                     ].map((stat, i) => (
                       <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-2 sm:p-3 pl-4 sm:pl-6 rounded-xl sm:rounded-2xl flex items-center space-x-2 sm:space-x-3 shadow-2xl pointer-events-auto">
                         <div className="text-right">

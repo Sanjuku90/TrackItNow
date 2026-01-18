@@ -1,0 +1,62 @@
+==> Downloading cache...
+==> Cloning from https://github.com/Sanjuku90/TrackItNow
+==> Checking out commit 8b714dcc88b1a2e022c12016664628d1c208718d in branch main
+==> Downloaded 223MB in 1s. Extraction took 4s.
+==> Using Node.js version 22.16.0 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+==> Running build command 'npm install; npm run build'...
+up to date, audited 551 packages in 1s
+70 packages are looking for funding
+  run `npm fund` for details
+14 vulnerabilities (1 low, 8 moderate, 5 high)
+To address issues that do not require attention, run:
+  npm audit fix
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+Run `npm audit` for details.
+> rest-express@1.0.0 build
+> vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+vite v5.4.19 building for production...
+transforming...
+Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ 2178 modules transformed.
+rendering chunks...
+computing gzip size...
+../dist/public/index.html                                                           0.63 kB │ gzip:   0.38 kB
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+../dist/public/assets/modern_high-tech_device_tracking_hero_image-B99ggVS6.png  1,259.30 kB
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+../dist/public/assets/index-Gz5uOWia.css                                           84.85 kB │ gzip:  14.23 kB
+../dist/public/assets/index-BGWqE_c7.js                                           674.56 kB │ gzip: 203.23 kB
+✓ built in 6.04s
+  dist/index.js  31.3kb
+⚡ Done in 10ms
+==> Uploading build...
+==> Uploaded in 6.2s. Compression took 3.8s
+==> Build successful 🎉
+==> Deploying...
+==> Running 'npm run start'
+> rest-express@1.0.0 start
+> NODE_ENV=production node dist/index.js
+10:44:46 AM [express] serving on port 10000
+==> Your service is live 🎉
+==> 
+==> ///////////////////////////////////////////////////////////
+==> 
+==> Available at your primary URL https://trackitnow-ohhe.onrender.com
+==> 
+==> ///////////////////////////////////////////////////////////
+Email transporter configuration error: Error: Connection timeout
+    at SMTPConnection._formatError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection._onError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:795:20)
+    at Timeout.<anonymous> (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:237:22)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7) {
+  code: 'ETIMEDOUT',
+  command: 'CONN'
+}
+Please ensure GMAIL_APP_PASSWORD e

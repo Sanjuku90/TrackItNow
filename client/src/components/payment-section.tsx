@@ -193,7 +193,7 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
                   onClick={handlePaymentClick}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/40"
                 >
-                  J'ai envoyé le paiement
+                  Confirmer l'achat du plan
                 </Button>
               ) : (
                 <div className="space-y-4">

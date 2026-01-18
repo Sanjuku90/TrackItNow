@@ -81,41 +81,54 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     });
   };
 
+  // Realistic movement simulation following streets in Lomé
   useEffect(() => {
-    if (isReviewMode) return; // Don't move if reviewing old data
+    if (isReviewMode) return;
     if (!isVisible) return;
-    
+
     const moveInterval = setInterval(() => {
       setCurrentLocation(prev => {
-        const newLat = prev[0] + direction[0];
-        const newLng = prev[1] + direction[1];
+        // Lomé coordinate bounds
+        const walkSpeed = 0.00015; 
         
+        // Simple logic to mimic street turns
+        // We alternate between changing lat and lng to simulate 90-degree turns typical of street grids
+        const isHorizontal = Math.random() > 0.5;
+        const drift = (Math.random() > 0.5 ? 1 : -1) * walkSpeed;
+        
+        let newLat = prev[0];
+        let newLng = prev[1];
+
+        if (isHorizontal) {
+          newLng += drift;
+        } else {
+          newLat += drift;
+        }
+
+        // Keep within Lomé area roughly
+        if (newLat > 6.22) newLat -= walkSpeed * 5;
+        if (newLat < 6.10) newLat += walkSpeed * 5;
+        if (newLng > 1.28) newLng -= walkSpeed * 5;
+        if (newLng < 1.12) newLng += walkSpeed * 5;
+
         // System 3: Breadcrumbs - store trail if priority
         if (isPriority) {
           setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
-        addActivity('Mise à jour du traçage - Appareil en mouvement', 'info', [newLat, newLng]);
-        
-        if (Math.random() > 0.7) {
-          addActivity('Alerte de proximité : Cible entrée dans le périmètre de sécurité', 'warning');
-          try {
-            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
-            oscillator.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.1);
-          } catch (e) {}
-        }
+        addActivity('Mise à jour du traçage - Déplacement dans les rues', 'info', [newLat, newLng]);
         
         return [newLat, newLng] as [number, number];
       });
-    }, isPriority ? 3000 : 5000);
+      
+      setLastUpdate(new Date().toLocaleTimeString());
+    }, isPriority ? 6000 : 10000);
 
     return () => clearInterval(moveInterval);
-  }, [isVisible, isPriority, direction, geofences]);
+  }, [isVisible, isPriority, isReviewMode]);
+
+  // Set initial last update
+  const [lastUpdate, setLastUpdate] = useState(new Date().toLocaleTimeString());
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info', location?: [number, number]) => {
     const newActivity = createActivityEntry(message, type, location);

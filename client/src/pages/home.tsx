@@ -449,26 +449,32 @@ export default function Home() {
             </DialogHeader>
             <form onSubmit={handleAuth} className="space-y-6">
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Email Address</Label>
-                <Input 
-                  type="email" 
-                  value={email} 
-                  onChange={e => setEmail(e.target.value)} 
-                  required 
-                  className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary"
-                  placeholder="name@company.com"
-                />
+                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Email Address</Label>
+                <div className="relative">
+                  <Input 
+                    type="email" 
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)} 
+                    required 
+                    className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
+                    placeholder="name@company.com"
+                  />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
+                </div>
               </div>
               <div className="space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500">Password</Label>
-                <Input 
-                  type="password" 
-                  value={password} 
-                  onChange={e => setPassword(e.target.value)} 
-                  required 
-                  className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary"
-                  placeholder="••••••••"
-                />
+                <Label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Password</Label>
+                <div className="relative">
+                  <Input 
+                    type="password" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} 
+                    required 
+                    className="bg-white/5 border-white/10 h-12 rounded-xl focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
+                    placeholder="••••••••"
+                  />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4" />
+                </div>
               </div>
               <Button type="submit" className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
                 {isLogin ? "Continue Tracking" : "Sign Up Now"}

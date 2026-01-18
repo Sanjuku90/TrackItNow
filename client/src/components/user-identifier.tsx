@@ -58,7 +58,7 @@ export function UserIdentifier({
                   value={identifier}
                   onChange={(e) => onIdentifierChange(e.target.value)}
                   placeholder={placeholder}
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary"
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
                 />
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
               </div>
@@ -72,7 +72,7 @@ export function UserIdentifier({
                   value={password}
                   onChange={(e) => onPasswordChange(e.target.value)}
                   placeholder="Enter your account password"
-                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-14 text-lg focus:ring-primary focus:border-primary"
+                  className="h-14 bg-white/5 border-white/10 rounded-2xl pl-12 pr-14 text-lg focus:ring-primary focus:border-primary text-white placeholder:text-slate-600"
                 />
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5" />
                 <Button

@@ -154,34 +154,34 @@ export default function UserDashboard() {
 
             <div className="grid md:grid-cols-2 gap-6">
               {plans.map((plan) => (
-                <Card key={plan.id} className={`bg-white/5 border-white/5 rounded-[2.5rem] p-8 flex flex-col relative group transition-all duration-300 hover:scale-[1.02] ${plan.popular ? 'border-primary/20 bg-primary/5' : ''}`}>
+                <Card key={plan.id} className={`bg-white/5 border-white/5 rounded-[2.5rem] p-6 lg:p-8 flex flex-col relative group transition-all duration-300 hover:scale-[1.02] overflow-hidden ${plan.popular ? 'border-primary/20 bg-primary/5' : ''}`}>
                   {plan.popular && (
-                    <div className="absolute top-8 right-8">
-                      <Badge className="bg-primary text-white border-none text-[10px] uppercase font-bold tracking-widest px-3">Most Popular</Badge>
+                    <div className="absolute top-6 right-6 lg:top-8 lg:right-8">
+                      <Badge className="bg-primary text-white border-none text-[10px] uppercase font-bold tracking-widest px-3">Popular</Badge>
                     </div>
                   )}
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 bg-${plan.color}-500/10 text-${plan.color}-400`}>
-                    <plan.icon size={28} />
+                  <div className={`w-12 h-12 lg:w-14 lg:h-14 rounded-2xl flex items-center justify-center mb-6 lg:mb-8 bg-${plan.color}-500/10 text-${plan.color}-400 shrink-0`}>
+                    <plan.icon size={24} className="lg:size-7" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline space-x-2 mb-8">
-                    <span className="text-4xl font-bold">{plan.price}</span>
+                  <h3 className="text-xl lg:text-2xl font-bold mb-2 break-words">{plan.name}</h3>
+                  <div className="flex items-baseline space-x-2 mb-6 lg:mb-8">
+                    <span className="text-3xl lg:text-4xl font-bold">{plan.price}</span>
                     <span className="text-slate-500 text-sm">/ device</span>
                   </div>
-                  <ul className="space-y-4 mb-10 flex-1">
+                  <ul className="space-y-3 lg:space-y-4 mb-8 lg:mb-10 flex-1">
                     {plan.features.map((f, i) => (
-                      <li key={i} className="flex items-center text-sm text-slate-300">
-                        <CheckCircle2 className={`w-4 h-4 mr-3 text-${plan.color}-400`} />
-                        {f}
+                      <li key={i} className="flex items-start text-sm text-slate-300">
+                        <CheckCircle2 className={`w-4 h-4 mr-3 mt-0.5 text-${plan.color}-400 shrink-0`} />
+                        <span className="leading-tight">{f}</span>
                       </li>
                     ))}
                   </ul>
                   <Button 
-                    className={`w-full h-14 rounded-2xl font-bold text-lg ${plan.popular ? 'bg-primary hover:bg-primary/90' : 'bg-white/10 hover:bg-white/20'}`}
+                    className={`w-full h-12 lg:h-14 rounded-2xl font-bold text-base lg:text-lg ${plan.popular ? 'bg-primary hover:bg-primary/90' : 'bg-white/10 hover:bg-white/20'}`}
                     onClick={() => setLocation(plan.id === 'priority' ? '/tracking?fast=true' : '/tracking')}
                   >
                     Select Plan
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4 lg:w-5 lg:h-5" />
                   </Button>
                 </Card>
               ))}

@@ -1,19 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Clock, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { CreditCard, Clock, ShieldCheck, Lock, CheckCircle2, Zap } from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface PaymentSectionProps {
-  selectedDevice: string;
-  imei: string;
   isVisible: boolean;
-  onPaymentConfirmed: () => void;
+  onPaymentComplete: () => void;
+  amount: number;
 }
 
-export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfirmed }: PaymentSectionProps) {
+export function PaymentSection({ isVisible, onPaymentComplete, amount }: PaymentSectionProps) {
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(60); // 1 minute in seconds
-  const [selectedPlan, setSelectedPlan] = useState<'standard' | 'priority' | 'family' | 'temporary'>('standard');
+  const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes in seconds
 
   useEffect(() => {
     if (!paymentSubmitted) return;
@@ -22,6 +20,9 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
       setTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(interval);
+          setTimeout(() => {
+            onPaymentComplete();
+          }, 1000);
           return 0;
         }
         return prev - 1;
@@ -29,16 +30,10 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [paymentSubmitted]);
+  }, [paymentSubmitted, onPaymentComplete]);
 
   const handlePaymentClick = () => {
-    if (selectedPlan === 'priority' || selectedPlan === 'family') {
-      const url = new URL(window.location.href);
-      url.searchParams.set('fast', 'true');
-      window.history.replaceState({}, '', url);
-    }
     setPaymentSubmitted(true);
-    onPaymentConfirmed();
   };
 
   const formatTime = (seconds: number) => {
@@ -49,128 +44,70 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
 
   if (!isVisible) return null;
 
-  const getPrice = () => {
-    switch (selectedPlan) {
-      case 'priority': return 32.90;
-      case 'family': return 49.90;
-      case 'temporary': return 4.99;
-      default: return 9.99;
-    }
-  };
-
-  const currentPrice = getPrice();
-
   return (
-    <div className="mb-8 animate-in slide-in-from-bottom-5 duration-300">
-      <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
-        <CardContent className="p-8">
+    <div className="mb-8 animate-in slide-in-from-bottom-5 duration-300 w-full max-w-2xl mx-auto">
+      <Card className="bg-white/5 border-white/10 rounded-[2.5rem] overflow-hidden">
+        <CardContent className="p-8 sm:p-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
             <h2 className="text-2xl font-bold flex items-center">
-              <CreditCard className="text-blue-400 mr-3" size={24} />
-              Choix du Plan de Traçage
+              <CreditCard className="text-primary mr-3" size={24} />
+              Finaliser le Paiement
             </h2>
             <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5">
               <ShieldCheck className="text-emerald-400" size={18} />
-              <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Sécurisé par SSL 256-bit</span>
+              <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Sécurisé SSL</span>
             </div>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-1 gap-8">
             <div className="space-y-6">
-              <div 
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${selectedPlan === 'standard' ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'border-slate-700 bg-slate-800/50'}`}
-                onClick={() => setSelectedPlan('standard')}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-lg flex items-center">
-                    {selectedPlan === 'standard' && <CheckCircle2 className="text-blue-400 mr-2" size={18} />}
-                    Plan Basique
-                  </h3>
-                  <span className="text-xl font-bold">$9.99</span>
+              <div className="p-6 rounded-3xl bg-white/5 border border-white/10">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-slate-400">Total à payer:</span>
+                  <span className="text-3xl font-bold text-white">${amount} USD</span>
                 </div>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• Position fixe instantanée</li>
-                  <li>• Rapport d'activité unique</li>
-                  <li>• Localisation GPS précise</li>
-                </ul>
-              </div>
-
-              <div 
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${selectedPlan === 'priority' ? 'border-emerald-500 bg-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'border-slate-700 bg-slate-800/50'}`}
-                onClick={() => setSelectedPlan('priority')}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-lg text-emerald-400 flex items-center">
-                    {selectedPlan === 'priority' && <CheckCircle2 className="text-emerald-400 mr-2" size={18} />}
-                    Plan Premium Priority
-                  </h3>
-                  <span className="text-xl font-bold text-emerald-400">$32.90</span>
-                </div>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• Traçage en temps réel continu</li>
-                  <li>• Suivi des mouvements (100m/étape)</li>
-                  <li>• Alertes de déplacement instantanées</li>
-                  <li>• Historique complet des positions</li>
-                </ul>
-              </div>
-
-              <div className="pt-4 border-t border-slate-700">
-                <div className="flex justify-between text-slate-300 mb-2">
-                  <span>Appareil:</span>
-                  <span>{selectedDevice}</span>
-                </div>
-                <div className="flex justify-between text-white font-bold text-lg">
-                  <span>Total à payer:</span>
-                  <span>${currentPrice} USD</span>
+                <div className="flex items-center gap-2 text-primary font-bold text-sm bg-primary/10 p-3 rounded-2xl">
+                  <Lock size={16} />
+                  <span>Accès Satellite Activé après vérification</span>
                 </div>
               </div>
-
-              <div className="grid grid-cols-3 gap-2 mt-4">
-                <div className="flex flex-col items-center gap-1 p-2 rounded bg-slate-900/40 border border-slate-700/50">
-                  <Lock className="text-slate-500" size={14} />
-                  <span className="text-[10px] uppercase text-slate-500 font-bold">Encrypted</span>
-                </div>
-                <div className="flex flex-col items-center gap-1 p-2 rounded bg-slate-900/40 border border-slate-700/50">
-                  <ShieldCheck className="text-slate-500" size={14} />
-                  <span className="text-[10px] uppercase text-slate-500 font-bold">Verified</span>
-                </div>
-                <div className="flex flex-col items-center gap-1 p-2 rounded bg-slate-900/40 border border-slate-700/50">
-                  <CheckCircle2 className="text-slate-500" size={14} />
-                  <span className="text-[10px] uppercase text-slate-500 font-bold">Certified</span>
-                </div>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Paiement Crypto (USDT TRC-20)</h3>
-              <div className="bg-slate-700/50 rounded-lg p-4 mb-4">
-                <p className="text-sm text-slate-300 mb-2">Envoyez exactement ${currentPrice} USDT à :</p>
-                <div className="bg-slate-900 rounded p-3 font-mono text-sm break-all border">
-                  TAB1oeEKDS5NATwFAaUrTioDU9djX7anyS
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-bold flex items-center">
+                  <Zap className="text-primary mr-2" size={20} />
+                  Paiement USDT (TRC-20)
+                </h3>
+                <div className="bg-white/5 rounded-[2rem] p-6 border border-white/10">
+                  <p className="text-sm text-slate-400 mb-4">Envoyez exactement <span className="text-white font-bold">${amount} USDT</span> à l'adresse suivante :</p>
+                  <div className="bg-[#0A0E1A] rounded-2xl p-4 font-mono text-sm break-all border border-primary/30 text-primary shadow-inner">
+                    TYjqWPHHpSrkEnkfNjueLpxeYevo6fwdg4
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-4 text-center uppercase tracking-widest font-bold">Réseau: TRON (TRC-20) UNIQUEMENT</p>
                 </div>
               </div>
               
               {!paymentSubmitted ? (
                 <Button 
                   onClick={handlePaymentClick}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 px-6 rounded-lg shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/40"
+                  className="w-full h-16 bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl shadow-xl shadow-primary/20 transition-all text-lg"
                 >
-                  Confirmer l'achat du plan
+                  J'ai effectué le transfert
                 </Button>
               ) : (
-                <div className="space-y-4">
-                  <div className="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 text-center">
-                    <Clock className="mx-auto mb-2 text-blue-400" size={24} />
-                    <p className="text-sm text-blue-300 mb-1">Vérification du paiement en cours</p>
-                    <p className="text-2xl font-mono font-bold text-white">{formatTime(timeRemaining)}</p>
-                    <p className="text-xs text-slate-400">Confirmation automatique en cours...</p>
+                <div className="space-y-6">
+                  <div className="bg-primary/10 border border-primary/20 rounded-[2rem] p-8 text-center">
+                    <Clock className="mx-auto mb-4 text-primary animate-spin-slow" size={32} />
+                    <p className="text-sm text-slate-300 mb-2">Vérification de la transaction sur la Blockchain...</p>
+                    <p className="text-4xl font-mono font-bold text-white mb-2">{formatTime(timeRemaining)}</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
+                      <div className="w-2 h-2 rounded-full bg-primary animate-bounce" />
+                    </div>
                   </div>
-                  <Button 
-                    disabled
-                    className="w-full bg-slate-600 text-slate-400 font-medium py-3 px-6 cursor-not-allowed"
-                  >
-                    Traitement du paiement...
-                  </Button>
+                  <p className="text-xs text-slate-500 text-center leading-relaxed">
+                    Veuillez ne pas fermer cette page. Le système de tracking s'activera automatiquement dès la confirmation du dépôt.
+                  </p>
                 </div>
               )}
             </div>

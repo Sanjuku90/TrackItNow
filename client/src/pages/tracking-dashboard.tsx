@@ -18,7 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
 
-type Step = 'platform' | 'device' | 'identifier' | 'auth' | 'dashboard';
+type Step = 'platform' | 'device' | 'payment' | 'identifier' | 'auth' | 'dashboard';
 
 export default function TrackingDashboard() {
   const [, setLocation] = useLocation();
@@ -85,10 +85,18 @@ export default function TrackingDashboard() {
 
   const handleDeviceSelect = (device: string) => {
     setSelectedDevice(device);
-    setCurrentStep('identifier');
+    setCurrentStep('payment');
     toast({
       title: "Device Selected",
       description: `${device} selected successfully`,
+    });
+  };
+
+  const handlePaymentComplete = () => {
+    setCurrentStep('identifier');
+    toast({
+      title: "Payment Verified",
+      description: "Service activated successfully",
     });
   };
 
@@ -183,11 +191,12 @@ export default function TrackingDashboard() {
         <div className="relative w-full">
           {/* Progress Indicator */}
           <div className="mb-6 sm:mb-10 flex justify-between items-center max-w-xl mx-auto px-2 sm:px-4">
-            {['Plateforme', 'Appareil', 'Accès', 'Suivi'].map((step, i) => {
-              const stepKey = ['platform', 'device', 'identifier', 'dashboard'][i] as Step;
+            {['Plateforme', 'Appareil', 'Paiement', 'Accès', 'Suivi'].map((step, i) => {
+              const stepKey = ['platform', 'device', 'payment', 'identifier', 'dashboard'][i] as Step;
               const isActive = currentStep === stepKey || 
                 (stepKey === 'platform' && currentStep !== 'platform') ||
                 (stepKey === 'device' && !['platform', 'device'].includes(currentStep)) ||
+                (stepKey === 'payment' && !['platform', 'device', 'payment'].includes(currentStep)) ||
                 (stepKey === 'identifier' && ['auth', 'dashboard'].includes(currentStep));
               
               return (
@@ -227,6 +236,16 @@ export default function TrackingDashboard() {
                     selectedDevice={selectedDevice}
                     onDeviceSelect={handleDeviceSelect}
                     isVisible={true}
+                  />
+                </motion.div>
+              )}
+
+              {currentStep === 'payment' && (
+                <motion.div key="payment" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <PaymentSection
+                    isVisible={true}
+                    onPaymentComplete={handlePaymentComplete}
+                    amount={isFastTrack ? 32.90 : 9.99}
                   />
                 </motion.div>
               )}

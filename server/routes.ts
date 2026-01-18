@@ -187,6 +187,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post('/api/admin/create-test-purchase', async (req, res) => {
+    const purchase = await storage.createPurchase({
+      userId: null,
+      device: "Test Device",
+      imei: "TEST-" + Math.random().toString(36).substring(2, 6).toUpperCase(),
+      amount: 999,
+      status: "pending",
+      userEmail: "test@example.com",
+      trackingType: "standard"
+    });
+    res.json(purchase);
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

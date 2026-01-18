@@ -45,6 +45,19 @@ export default function AdminDashboard() {
 
   return (
     <div className="container mx-auto py-10 px-4">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Administration</h1>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={async () => {
+            await fetch('/api/admin/create-test-purchase', { method: 'POST' });
+            queryClient.invalidateQueries({ queryKey: ["/api/admin/purchases"] });
+          }}
+        >
+          Créer un test
+        </Button>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Validation des Achats</CardTitle>

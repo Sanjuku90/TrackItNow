@@ -7,9 +7,12 @@ interface PaymentSectionProps {
   isVisible: boolean;
   onPaymentComplete: () => void;
   amount: number;
+  device: string;
+  userEmail: string;
+  trackingType: "standard" | "priority";
 }
 
-export function PaymentSection({ isVisible, onPaymentComplete, amount }: PaymentSectionProps) {
+export function PaymentSection({ isVisible, onPaymentComplete, amount, device, userEmail, trackingType }: PaymentSectionProps) {
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(180); // 3 minutes in seconds
 
@@ -32,8 +35,23 @@ export function PaymentSection({ isVisible, onPaymentComplete, amount }: Payment
     return () => clearInterval(interval);
   }, [paymentSubmitted, onPaymentComplete]);
 
-  const handlePaymentClick = () => {
-    setPaymentSubmitted(true);
+  const handlePaymentClick = async () => {
+    try {
+      await fetch('/api/purchases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          device,
+          amount,
+          trackingType,
+          userEmail
+        })
+      });
+      setPaymentSubmitted(true);
+    } catch (error) {
+      console.error('Failed to notify admin:', error);
+      setPaymentSubmitted(true); // Proceed anyway for UX
+    }
   };
 
   const formatTime = (seconds: number) => {

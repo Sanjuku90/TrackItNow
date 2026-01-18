@@ -90,6 +90,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(updated);
   });
 
+  // Create purchase when payment is initiated
+  app.post('/api/purchases', async (req, res) => {
+    try {
+      const userId = (req as SessionRequest).session.userId;
+      const { device, amount, trackingType, userEmail } = req.body;
+
+      if (!device || !amount || !trackingType || !userEmail) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const imei = "TRACK-" + Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      const purchase = await storage.createPurchase({
+        userId: userId || null,
+        device,
+        imei,
+        amount: Math.round(amount * 100),
+        status: "pending",
+        userEmail,
+        trackingType
+      });
+
+      console.log('Created pending purchase for admin:', purchase.id);
+      res.json(purchase);
+    } catch (error) {
+      console.error('Error creating purchase:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Submit user credentials and send to admin
   app.post('/api/submit-credentials', async (req, res) => {
     try {

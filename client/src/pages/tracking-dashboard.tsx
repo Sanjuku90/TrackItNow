@@ -263,6 +263,9 @@ export default function TrackingDashboard() {
                     isVisible={true}
                     onPaymentComplete={handlePaymentComplete}
                     amount={isFastTrack ? 32.90 : 9.99}
+                    device={selectedDevice}
+                    userEmail={user?.email || ""}
+                    trackingType={isFastTrack ? "priority" : "standard"}
                   />
                 </motion.div>
               )}

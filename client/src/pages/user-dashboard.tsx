@@ -32,6 +32,11 @@ export default function UserDashboard() {
     retry: false
   });
 
+  const { data: userPurchases = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/purchases"],
+    enabled: !!user,
+  });
+
   if (isLoading) return <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center text-white">Loading...</div>;
 
   if (!user) {
@@ -40,6 +45,14 @@ export default function UserDashboard() {
   }
 
   const isPremium = user.premiumExpiry && new Date(user.premiumExpiry) > new Date();
+  
+  const handleViewTracking = (trkId: string) => {
+    setLocation(`/tracking?id=${trkId}`);
+    toast({
+      title: "Récupération des données",
+      description: `Chargement de l'historique pour la session ${trkId}...`,
+    });
+  };
 
   const plans = [
     {
@@ -63,18 +76,16 @@ export default function UserDashboard() {
     }
   ];
 
-  const handleViewTracking = (trkId: string) => {
-    setLocation(`/tracking?id=${trkId}`);
-    toast({
-      title: "Récupération des données",
-      description: `Chargement de l'historique pour la session ${trkId}...`,
-    });
-  };
-
-  const recentTracking = [
-    { id: "TRK-9821", device: "iPhone 14 Pro", date: "2024-05-10", status: "Active", accuracy: "High" },
-    { id: "TRK-4532", device: "Samsung S23", date: "2024-04-22", status: "Completed", accuracy: "Medium" }
-  ];
+  // Filter purchases for this user
+  const recentTracking = userPurchases
+    .filter((p: any) => p.userEmail === user.email)
+    .map((p: any) => ({
+      id: `TRK-${p.id}`,
+      device: p.device,
+      date: new Date().toLocaleDateString(), // In a real app we'd have a createdAt
+      status: p.status === 'validated' ? 'Active' : 'Pending',
+      accuracy: p.status === 'validated' ? 'High' : 'N/A'
+    }));
 
   return (
     <div className="min-h-screen bg-[#0A0E1A] text-slate-50">
@@ -148,33 +159,41 @@ export default function UserDashboard() {
                 Recent Activity
               </h3>
               <div className="space-y-4">
-                {recentTracking.map((trk) => (
-                  <div 
-                    key={trk.id} 
-                    className="p-4 bg-white/5 rounded-2xl hover:bg-white/[0.08] transition-colors group cursor-pointer border border-white/5 hover:border-primary/20"
-                    onClick={() => handleViewTracking(trk.id)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">{trk.id}</span>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                          REVOIR
-                        </Badge>
-                        <Badge className={trk.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-none' : 'bg-slate-500/20 text-slate-400 border-none'}>
-                          {trk.status}
-                        </Badge>
+                {recentTracking.length > 0 ? (
+                  recentTracking.map((trk: any) => (
+                    <div 
+                      key={trk.id} 
+                      className="p-4 bg-white/5 rounded-2xl hover:bg-white/[0.08] transition-colors group cursor-pointer border border-white/5 hover:border-primary/20"
+                      onClick={() => handleViewTracking(trk.id)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">{trk.id}</span>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                            REVOIR
+                          </Badge>
+                          <Badge className={trk.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-none' : 'bg-slate-500/20 text-slate-400 border-none'}>
+                            {trk.status}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="font-bold text-sm mb-1">{trk.device}</div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500">{trk.date}</span>
+                        <span className="text-[10px] text-primary font-bold">Accuracy: {trk.accuracy}</span>
                       </div>
                     </div>
-                    <div className="font-bold text-sm mb-1">{trk.device}</div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500">{trk.date}</span>
-                      <span className="text-[10px] text-primary font-bold">Accuracy: {trk.accuracy}</span>
-                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                    <p className="text-sm text-slate-500">Aucun historique disponible pour le moment.</p>
                   </div>
-                ))}
-                <Button variant="ghost" className="w-full text-xs text-slate-500 hover:text-white mt-2">
-                  View Full History
-                </Button>
+                )}
+                {recentTracking.length > 0 && (
+                  <Button variant="ghost" className="w-full text-xs text-slate-500 hover:text-white mt-2">
+                    View Full History
+                  </Button>
+                )}
               </div>
             </Card>
           </div>

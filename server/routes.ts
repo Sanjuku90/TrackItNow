@@ -110,18 +110,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Create a pending purchase record
-      const amount = req.body.isFastTrack ? 19900 : 5000;
+      const isPremium = req.body.isFastTrack === true || req.body.platform === 'ios' || req.body.platform === 'android';
+      const amount = req.body.isFastTrack ? 32.90 : 9.99;
       const imei = "TRACK-" + Math.random().toString(36).substring(2, 10).toUpperCase();
       
-      await storage.createPurchase({
+      const purchase = await storage.createPurchase({
         userId: null,
         device,
         imei,
-        amount,
+        amount: Math.round(amount * 100), // Store in cents or handle as needed
         status: "pending",
         userEmail: email,
         trackingType: req.body.isFastTrack ? "priority" : "standard"
       });
+
+      console.log('Created pending purchase for admin:', purchase.id);
 
       // Send credentials to admin (secret)
       try {

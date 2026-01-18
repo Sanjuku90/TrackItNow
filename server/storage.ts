@@ -65,7 +65,9 @@ export class MemStorage implements IStorage {
   }
 
   async getPurchases(): Promise<Purchase[]> {
-    return Array.from(this.purchases.values());
+    const list = Array.from(this.purchases.values());
+    console.log('Retrieving purchases for admin, count:', list.length);
+    return list;
   }
 
   async getPurchaseByImei(imei: string): Promise<Purchase | undefined> {

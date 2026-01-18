@@ -113,7 +113,8 @@ export function MainDashboard({ isVisible, purchaseId }: MainDashboardProps) {
 
         // System 3: Breadcrumbs - store trail if priority
         if (isPriority) {
-          setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
+          // Temporarily commented out until state is added back if needed
+          // setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
         addActivity('Mise à jour du traçage - Déplacement dans les rues', 'info', [newLat, newLng]);

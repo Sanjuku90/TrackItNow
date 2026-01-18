@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   isAdmin: boolean("is_admin").notNull().default(false),
+  premiumExpiry: text("premium_expiry"),
 });
 
 export const purchases = pgTable("purchases", {

@@ -1,7 +1,8 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { users, purchases, geofences, ghostLinks, locationHistory, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink, type LocationHistory, type InsertLocationHistory } from "@shared/schema";
-
-// modify the interface with any CRUD methods
-// you might need
+import * as schema from "@shared/schema";
+import { pool } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -30,150 +31,97 @@ export interface IStorage {
   addLocationHistory(entry: InsertLocationHistory): Promise<LocationHistory>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private purchases: Map<number, Purchase>;
-  private geofences: Map<number, Geofence>;
-  private ghostLinks: Map<number, GhostLink>;
-  private history: Map<number, LocationHistory>;
-  currentUserId: number;
-  currentPurchaseId: number;
-  currentGeofenceId: number;
-  currentGhostLinkId: number;
-  currentHistoryId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.purchases = new Map();
-    this.geofences = new Map();
-    this.ghostLinks = new Map();
-    this.history = new Map();
-    this.currentUserId = 1;
-    this.currentPurchaseId = 1;
-    this.currentGeofenceId = 1;
-    this.currentGhostLinkId = 1;
-    this.currentHistoryId = 1;
-  }
+export class DatabaseStorage implements IStorage {
+  private db = drizzle(pool, { schema });
 
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await this.db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.email === email,
-    );
+    const [user] = await this.db.select().from(users).where(eq(users.email, email));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id, isAdmin: insertUser.isAdmin ?? false };
-    this.users.set(id, user);
+    const [user] = await this.db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async getPurchases(): Promise<Purchase[]> {
-    const list = Array.from(this.purchases.values());
-    console.log('Retrieving purchases for admin, count:', list.length);
-    return list;
+    return await this.db.select().from(purchases);
   }
 
   async getPurchaseByImei(imei: string): Promise<Purchase | undefined> {
-    return Array.from(this.purchases.values()).find(p => p.imei === imei);
+    const [purchase] = await this.db.select().from(purchases).where(eq(purchases.imei, imei));
+    return purchase;
   }
 
   async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
-    const id = this.currentPurchaseId++;
-    const purchase: Purchase = { 
-      ...insertPurchase, 
-      id, 
-      status: insertPurchase.status ?? "pending",
-      userId: insertPurchase.userId ?? null,
-      trackingType: insertPurchase.trackingType ?? "standard",
-      lastTrackingUpdate: null,
-      lastLat: null,
-      lastLng: null,
-      premiumExpiry: null
-    };
-    this.purchases.set(id, purchase);
+    const [purchase] = await this.db.insert(purchases).values(insertPurchase).returning();
     return purchase;
   }
 
   async updatePurchaseStatus(id: number, status: string): Promise<Purchase | undefined> {
-    const purchase = this.purchases.get(id);
-    if (!purchase) return undefined;
-    
-    const updatedPurchase = { ...purchase, status: status as any };
-    this.purchases.set(id, updatedPurchase);
-    return updatedPurchase;
+    const [purchase] = await this.db.update(purchases)
+      .set({ status: status as any })
+      .where(eq(purchases.id, id))
+      .returning();
+    return purchase;
   }
 
   async updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined> {
-    const purchase = this.purchases.get(id);
-    if (!purchase) return undefined;
-    
-    const updatedPurchase = { ...purchase, lastLat: lat, lastLng: lng };
-    this.purchases.set(id, updatedPurchase);
-    return updatedPurchase;
+    const [purchase] = await this.db.update(purchases)
+      .set({ lastLat: lat, lastLng: lng })
+      .where(eq(purchases.id, id))
+      .returning();
+    return purchase;
   }
 
   async updateUserPremium(email: string, expiry: string): Promise<User | undefined> {
-    const user = Array.from(this.users.values()).find(u => u.email === email);
-    if (!user) return undefined;
-    
-    const updatedUser = { ...user, premiumExpiry: expiry };
-    this.users.set(user.id, updatedUser);
-    return updatedUser;
+    const [user] = await this.db.update(users)
+      .set({ premiumExpiry: expiry })
+      .where(eq(users.email, email))
+      .returning();
+    return user;
   }
 
   async getGeofences(purchaseId: number): Promise<Geofence[]> {
-    return Array.from(this.geofences.values()).filter(g => g.purchaseId === purchaseId);
+    return await this.db.select().from(geofences).where(eq(geofences.purchaseId, purchaseId));
   }
 
   async createGeofence(insertGeofence: InsertGeofence): Promise<Geofence> {
-    const id = this.currentGeofenceId++;
-    const geofence: Geofence = { 
-      ...insertGeofence, 
-      id,
-      purchaseId: insertGeofence.purchaseId ?? null,
-      isActive: insertGeofence.isActive ?? true
-    };
-    this.geofences.set(id, geofence);
+    const [geofence] = await this.db.insert(geofences).values(insertGeofence).returning();
     return geofence;
   }
 
   async deleteGeofence(id: number): Promise<boolean> {
-    return this.geofences.delete(id);
+    await this.db.delete(geofences).where(eq(geofences.id, id));
+    return true;
   }
 
   async getGhostLinkByToken(token: string): Promise<GhostLink | undefined> {
-    return Array.from(this.ghostLinks.values()).find(l => l.token === token);
+    const [link] = await this.db.select().from(ghostLinks).where(eq(ghostLinks.token, token));
+    return link;
   }
 
   async createGhostLink(insertGhostLink: InsertGhostLink): Promise<GhostLink> {
-    const id = this.currentGhostLinkId++;
-    const ghostLink: GhostLink = { 
-      ...insertGhostLink, 
-      id,
-      purchaseId: insertGhostLink.purchaseId ?? null,
-      isViewed: insertGhostLink.isViewed ?? false
-    };
-    this.ghostLinks.set(id, ghostLink);
-    return ghostLink;
+    const [link] = await this.db.insert(ghostLinks).values(insertGhostLink).returning();
+    return link;
   }
 
   async getLocationHistory(purchaseId: number): Promise<LocationHistory[]> {
-    return Array.from(this.history.values())
-      .filter(h => h.purchaseId === purchaseId)
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    return await this.db.select()
+      .from(locationHistory)
+      .where(eq(locationHistory.purchaseId, purchaseId))
+      .orderBy(locationHistory.timestamp);
   }
 
   async addLocationHistory(insertHistory: InsertLocationHistory): Promise<LocationHistory> {
-    const id = this.currentHistoryId++;
-    const entry: LocationHistory = { ...insertHistory, id };
-    this.history.set(id, entry);
+    const [entry] = await this.db.insert(locationHistory).values(insertHistory).returning();
     return entry;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

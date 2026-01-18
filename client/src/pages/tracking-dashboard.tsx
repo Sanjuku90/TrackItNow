@@ -183,7 +183,7 @@ export default function TrackingDashboard() {
         <div className="relative w-full">
           {/* Progress Indicator */}
           <div className="mb-6 sm:mb-10 flex justify-between items-center max-w-xl mx-auto px-2 sm:px-4">
-            {['platform', 'appareil', 'identifiant', 'tableau de bord'].map((step, i) => {
+            {['Plateforme', 'Appareil', 'Accès', 'Suivi'].map((step, i) => {
               const stepKey = ['platform', 'device', 'identifier', 'dashboard'][i] as Step;
               const isActive = currentStep === stepKey || 
                 (stepKey === 'platform' && currentStep !== 'platform') ||

@@ -7,21 +7,21 @@ const ADMIN_EMAIL = 'trackitnoww@gmail.com';
 const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD || 'rhlz xgeg chxh yoic';
 
 // Configuration du transporteur Gmail optimisée pour Render
+// L'utilisation du port 587 avec secure: false (STARTTLS) est la plus stable sur Render
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // Use SSL
+  port: 587,
+  secure: false, 
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD
   },
   tls: {
-    // Ne pas échouer sur les certificats invalides (souvent utile en cloud)
     rejectUnauthorized: false
   },
-  connectionTimeout: 15000, // 15 secondes
-  greetingTimeout: 15000,
-  socketTimeout: 15000
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 20000
 });
 
 // Test de la configuration du transporteur

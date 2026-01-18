@@ -228,16 +228,16 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             {isFamilyPlan && <Badge className="bg-blue-500/20 text-blue-400 border-none px-3 flex items-center gap-1"><Users size={12}/> Family Circle</Badge>}
             {isGhostLink && <Badge className="bg-purple-500/20 text-purple-400 border-none px-3 flex items-center gap-1"><Ghost size={12}/> Ghost Link Active</Badge>}
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">Tracking Terminal</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Terminal de Suivi</h2>
         </div>
         <div className="flex items-center space-x-3">
           <Button variant="outline" size="sm" className="rounded-xl border-white/10 bg-white/5 h-10">
             <History className="w-4 h-4 mr-2" />
-            Full History
+            Historique Complet
           </Button>
           <Button variant="outline" size="sm" className="rounded-xl border-white/10 bg-white/5 h-10">
             <Navigation2 className="w-4 h-4 mr-2" />
-            Route Plans
+            Itinéraires
           </Button>
         </div>
       </div>
@@ -302,18 +302,18 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
               </div>
               <div className="space-y-3 sm:space-y-4 w-full">
                 <div className="flex items-center justify-center sm:justify-start space-x-2">
-                  <h3 className="font-bold text-base sm:text-lg">Predictive Assistant</h3>
-                  <Badge variant="outline" className="text-[8px] sm:text-[10px] uppercase font-bold tracking-widest border-primary/20 text-primary">Active</Badge>
+                  <h3 className="font-bold text-base sm:text-lg">Assistant Prédictif</h3>
+                  <Badge variant="outline" className="text-[8px] sm:text-[10px] uppercase font-bold tracking-widest border-primary/20 text-primary">Actif</Badge>
                 </div>
                 <p className="text-slate-400 leading-relaxed text-sm sm:text-lg italic">
-                  "Target device is currently stationary at a residence in Lomé. Signal stability is optimal. Battery levels suggest approximately 4 hours of operation remaining. Recommend enabling remote lock if the device is not in a safe zone."
+                  "L'appareil cible est actuellement stationnaire dans une zone résidentielle à Lomé. La stabilité du signal est optimale. Le niveau de batterie suggère environ 4 heures d'autonomie restantes. Recommandation : activer le verrouillage à distance si l'appareil n'est pas en zone sûre."
                 </p>
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 pt-2">
                   <Button variant="default" size="sm" className="w-full sm:w-auto rounded-xl h-10 px-6 font-bold bg-primary hover:bg-primary/90" onClick={() => executeAction('lock')}>
-                    Confirm Remote Lock
+                    Confirmer le Verrouillage
                   </Button>
                   <Button variant="ghost" size="sm" className="w-full sm:w-auto rounded-xl h-10 px-6 text-slate-400 hover:text-white hover:bg-white/5">
-                    Ignore Recommendation
+                    Ignorer la Recommandation
                   </Button>
                 </div>
               </div>
@@ -325,7 +325,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           <Card className="bg-white/5 border-white/5 rounded-2xl sm:rounded-[2.5rem] p-6 sm:p-8">
             <h3 className="text-lg sm:text-xl font-bold mb-6 sm:mb-8 flex items-center">
               <Settings className="text-primary mr-3" size={20} />
-              Action Center
+              Centre d'Action
             </h3>
             
             <div className="space-y-4">
@@ -352,15 +352,15 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                     <Share2 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm truncate text-purple-300">Generate Ghost Link</h4>
-                    <p className="text-xs text-purple-400/60 truncate">Share secure temporary access</p>
+                    <h4 className="font-bold text-sm truncate text-purple-300">Générer Lien Ghost</h4>
+                    <p className="text-xs text-purple-400/60 truncate">Partage d'accès temporaire sécurisé</p>
                   </div>
                 </button>
               )}
               {[
-                { id: 'ring', name: 'Emergency Alarm', desc: 'Trigger maximum volume ring', icon: Volume2, color: 'emerald' },
-                { id: 'lock', name: 'Secure Lock', desc: 'Lock with custom message', icon: Lock, color: 'amber' },
-                { id: 'wipe', name: 'Nuclear Wipe', desc: 'Irreversible data erasure', icon: Trash2, color: 'red' }
+                { id: 'ring', name: 'Alarme d\'Urgence', desc: 'Déclencher la sonnerie au volume max', icon: Volume2, color: 'emerald' },
+                { id: 'lock', name: 'Verrouillage Sécure', desc: 'Verrouiller avec message personnalisé', icon: Lock, color: 'amber' },
+                { id: 'wipe', name: 'Effacement Total', desc: 'Suppression irréversible des données', icon: Trash2, color: 'red' }
               ].map((action) => (
                 <button
                   key={action.id}
@@ -383,7 +383,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             <div className="flex items-center justify-between mb-6 sm:mb-8">
               <h3 className="text-lg sm:text-xl font-bold flex items-center">
                 <History className="text-primary mr-3" size={20} />
-                Historique d'activité
+                Activités Récentes
               </h3>
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
@@ -411,7 +411,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                           </p>
                           {activity.location && (
                             <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary group-hover:bg-primary/10 transition-colors">
-                              REVOIR
+                              VOIR POSITION
                             </Badge>
                           )}
                         </div>

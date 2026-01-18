@@ -59,7 +59,7 @@ export default function Home() {
 
   const handleTrackingClick = (planType: "standard" | "priority") => {
     if (!user) {
-      setShowAuth(true);
+      setLocation("/auth");
     } else {
       setLocation(planType === "priority" ? "/tracking?fast=true" : "/tracking");
     }
@@ -144,7 +144,7 @@ export default function Home() {
                   </Button>
                 </div>
               ) : (
-                <Button variant="default" size="sm" onClick={() => setShowAuth(true)} className="rounded-full px-6">
+                <Button variant="default" size="sm" onClick={() => setLocation("/auth")} className="rounded-full px-6">
                   Sign In
                 </Button>
               )}

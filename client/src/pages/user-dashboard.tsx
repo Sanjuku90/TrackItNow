@@ -22,8 +22,11 @@ import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
 import { apiRequest } from "@/lib/queryClient";
 
+import { useToast } from "@/hooks/use-toast";
+
 export default function UserDashboard() {
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
   const { data: user, isLoading } = useQuery<any>({ 
     queryKey: ["/api/user"],
     retry: false
@@ -55,6 +58,14 @@ export default function UserDashboard() {
       popular: true
     }
   ];
+
+  const handleViewTracking = (trkId: string) => {
+    setLocation(`/tracking?id=${trkId}`);
+    toast({
+      title: "Récupération des données",
+      description: `Chargement de l'historique pour la session ${trkId}...`,
+    });
+  };
 
   const recentTracking = [
     { id: "TRK-9821", device: "iPhone 14 Pro", date: "2024-05-10", status: "Active", accuracy: "High" },
@@ -124,12 +135,21 @@ export default function UserDashboard() {
               </h3>
               <div className="space-y-4">
                 {recentTracking.map((trk) => (
-                  <div key={trk.id} className="p-4 bg-white/5 rounded-2xl hover:bg-white/[0.08] transition-colors group cursor-pointer">
+                  <div 
+                    key={trk.id} 
+                    className="p-4 bg-white/5 rounded-2xl hover:bg-white/[0.08] transition-colors group cursor-pointer border border-white/5 hover:border-primary/20"
+                    onClick={() => handleViewTracking(trk.id)}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">{trk.id}</span>
-                      <Badge className={trk.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-none' : 'bg-slate-500/20 text-slate-400 border-none'}>
-                        {trk.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                          REVOIR
+                        </Badge>
+                        <Badge className={trk.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-none' : 'bg-slate-500/20 text-slate-400 border-none'}>
+                          {trk.status}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="font-bold text-sm mb-1">{trk.device}</div>
                     <div className="flex items-center justify-between">

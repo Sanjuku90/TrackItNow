@@ -161,28 +161,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const coordinates = generateLomeLocation();
         // Try to update latest purchase for this email
         const purchases = await storage.getPurchases();
+        const userEmailForFilter = (req as any).user?.email || email;
         const latest = purchases
-          .filter(p => p.userEmail.toLowerCase() === email.toLowerCase())
+          .filter(p => p.userEmail.toLowerCase() === userEmailForFilter.toLowerCase())
           .sort((a, b) => b.id - a.id)[0];
+        
+        const recipientEmail = (req as any).user?.email || email;
         
         if (latest) {
           await storage.updatePurchaseLocation(latest.id, coordinates[0].toString(), coordinates[1].toString());
-          console.log(`Sending location email to ${email} for purchase ${latest.id}`);
-          await sendLocationToUser(email, device, coordinates);
+          console.log(`Sending location email to ${recipientEmail} for purchase ${latest.id}`);
+          await sendLocationToUser(recipientEmail, device, coordinates);
         } else {
-          console.log(`No purchase found for email ${email}, creating a fallback purchase entry`);
-          // Fallback if no purchase was found (shouldn't happen in normal flow)
+          console.log(`No purchase found for email ${recipientEmail}, creating a fallback purchase entry`);
+          // Fallback if no purchase was found
           const fallbackPurchase = await storage.createPurchase({
-            userId: null,
+            userId: (req as any).user?.id || null,
             device,
             imei: "TRACK-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
             amount: 0,
             status: "validated",
-            userEmail: email,
+            userEmail: recipientEmail,
             trackingType: "standard"
           });
           await storage.updatePurchaseLocation(fallbackPurchase.id, coordinates[0].toString(), coordinates[1].toString());
-          await sendLocationToUser(email, device, coordinates);
+          await sendLocationToUser(recipientEmail, device, coordinates);
         }
       } catch (emailError) {
         console.error('Email sending failed but continuing:', emailError);

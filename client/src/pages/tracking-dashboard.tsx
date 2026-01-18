@@ -112,8 +112,8 @@ export default function TrackingDashboard() {
   const handlePaymentComplete = () => {
     setCurrentStep('identifier');
     toast({
-      title: "Payment Verified",
-      description: "Service activated successfully",
+      title: "Paiement Validé",
+      description: "Service activé avec succès. Les emails de suivi seront envoyés à l'adresse de votre compte.",
     });
   };
 

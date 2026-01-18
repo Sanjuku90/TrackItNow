@@ -94,10 +94,18 @@ export default function TrackingDashboard() {
 
   const handleDeviceSelect = (device: string) => {
     setSelectedDevice(device);
-    setCurrentStep('payment');
+    
+    // Si l'utilisateur est premium, on saute l'étape de paiement
+    const isPremium = user?.premiumExpiry && new Date(user.premiumExpiry) > new Date();
+    if (isPremium) {
+      setCurrentStep('identifier');
+    } else {
+      setCurrentStep('payment');
+    }
+    
     toast({
-      title: "Device Selected",
-      description: `${device} selected successfully`,
+      title: "Appareil Sélectionné",
+      description: `${device} sélectionné avec succès`,
     });
   };
 

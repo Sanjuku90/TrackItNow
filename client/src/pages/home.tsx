@@ -61,8 +61,12 @@ export default function Home() {
     if (!user) {
       setLocation("/auth");
     } else {
-      // Direct payment flow logic here if needed, or just redirect
-      setLocation(planType === "priority" ? "/tracking?fast=true" : "/tracking");
+      const isPremium = user.premiumExpiry && new Date(user.premiumExpiry) > new Date();
+      if (isPremium) {
+        setLocation("/tracking?fast=true");
+      } else {
+        setLocation(planType === "priority" ? "/tracking?fast=true" : "/tracking");
+      }
     }
   };
 

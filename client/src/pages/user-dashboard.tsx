@@ -39,6 +39,8 @@ export default function UserDashboard() {
     return null;
   }
 
+  const isPremium = user.premiumExpiry && new Date(user.premiumExpiry) > new Date();
+
   const plans = [
     {
       id: "standard",
@@ -46,7 +48,8 @@ export default function UserDashboard() {
       price: "$9.99",
       features: ["Single Device", "Real-time Location", "Standard Support"],
       icon: Satellite,
-      color: "blue"
+      color: "blue",
+      disabled: isPremium
     },
     {
       id: "priority",
@@ -55,7 +58,8 @@ export default function UserDashboard() {
       features: ["Unlimited Devices", "Highest Accuracy", "24/7 Priority Support", "Remote Lock/Wipe"],
       icon: Zap,
       color: "emerald",
-      popular: true
+      popular: true,
+      disabled: isPremium
     }
   ];
 
@@ -118,8 +122,18 @@ export default function UserDashboard() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
                     <span className="text-sm text-slate-400">Current Plan</span>
-                    <Badge variant="outline" className="border-primary/20 text-primary">Free Tier</Badge>
+                    <Badge variant="outline" className={isPremium ? "border-emerald-500/20 text-emerald-400" : "border-primary/20 text-primary"}>
+                      {isPremium ? "Premium (8 mois)" : "Free Tier"}
+                    </Badge>
                   </div>
+                  {isPremium && (
+                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                      <span className="text-sm text-slate-400">Expire le</span>
+                      <span className="text-sm font-bold text-emerald-400">
+                        {new Date(user.premiumExpiry).toLocaleDateString()}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
                     <span className="text-sm text-slate-400">Member Since</span>
                     <span className="text-sm font-bold">May 2024</span>
@@ -199,9 +213,10 @@ export default function UserDashboard() {
                   <Button 
                     className={`w-full h-12 lg:h-14 rounded-2xl font-bold text-base lg:text-lg ${plan.popular ? 'bg-primary hover:bg-primary/90' : 'bg-white/10 hover:bg-white/20'}`}
                     onClick={() => setLocation(plan.id === 'priority' ? '/tracking?fast=true' : '/tracking')}
+                    disabled={plan.disabled}
                   >
-                    Select Plan
-                    <ArrowRight className="ml-2 w-4 h-4 lg:w-5 lg:h-5" />
+                    {plan.disabled ? 'Plan Actif' : 'Select Plan'}
+                    {!plan.disabled && <ArrowRight className="ml-2 w-4 h-4 lg:w-5 lg:h-5" />}
                   </Button>
                 </Card>
               ))}

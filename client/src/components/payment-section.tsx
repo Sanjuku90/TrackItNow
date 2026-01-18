@@ -102,7 +102,7 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="font-bold text-lg text-emerald-400 flex items-center">
                     {selectedPlan === 'priority' && <CheckCircle2 className="text-emerald-400 mr-2" size={18} />}
-                    Fast Track Priority
+                    Plan Premium Priority
                   </h3>
                   <span className="text-xl font-bold text-emerald-400">$32.90</span>
                 </div>
@@ -111,44 +111,6 @@ export function PaymentSection({ selectedDevice, imei, isVisible, onPaymentConfi
                   <li>• Suivi des mouvements (100m/étape)</li>
                   <li>• Alertes de déplacement instantanées</li>
                   <li>• Historique complet des positions</li>
-                </ul>
-              </div>
-
-              <div 
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${selectedPlan === 'family' ? 'border-blue-400 bg-blue-400/10 shadow-[0_0_15px_rgba(96,165,250,0.2)]' : 'border-slate-700 bg-slate-800/50'}`}
-                onClick={() => setSelectedPlan('family')}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-lg text-blue-400 flex items-center">
-                    {selectedPlan === 'family' && <CheckCircle2 className="text-blue-400 mr-2" size={18} />}
-                    Plan Famille
-                  </h3>
-                  <span className="text-xl font-bold text-blue-400">$49.90</span>
-                </div>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• Jusqu'à 5 appareils</li>
-                  <li>• Tableau de bord unique</li>
-                  <li>• Localisation partagée</li>
-                  <li>• Contrôle parental</li>
-                </ul>
-              </div>
-
-              <div 
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${selectedPlan === 'temporary' ? 'border-orange-500 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.2)]' : 'border-slate-700 bg-slate-800/50'}`}
-                onClick={() => setSelectedPlan('temporary')}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="font-bold text-lg text-orange-400 flex items-center">
-                    {selectedPlan === 'temporary' && <CheckCircle2 className="text-orange-400 mr-2" size={18} />}
-                    Partage Temporaire
-                  </h3>
-                  <span className="text-xl font-bold text-orange-400">$4.99</span>
-                </div>
-                <ul className="text-sm text-slate-400 space-y-1">
-                  <li>• Lien sécurisé (1h-2h)</li>
-                  <li>• Sans application</li>
-                  <li>• Usage unique</li>
-                  <li>• Accès navigateur</li>
                 </ul>
               </div>
 

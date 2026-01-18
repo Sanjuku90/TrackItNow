@@ -321,12 +321,12 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 text-left hover:bg-white/[0.08] transition-all flex flex-col">
               <div className="mb-8">
-                <Badge className="bg-slate-800 text-slate-400 border-none mb-4">Standard Plan</Badge>
+                <Badge className="bg-slate-800 text-slate-400 border-none mb-4">Plan Standard</Badge>
                 <div className="text-5xl font-bold mb-2">$9.99</div>
-                <div className="text-slate-400">One-time payment</div>
+                <div className="text-slate-400">Paiement unique</div>
               </div>
               <ul className="space-y-4 mb-12 flex-1">
-                {['Single Device Access', 'Real-time Location', 'Standard Support', 'Location History'].map((item, i) => (
+                {['Accès Appareil Unique', 'Localisation Temps Réel', 'Support Standard', 'Historique des Positions'].map((item, i) => (
                   <li key={i} className="flex items-center text-slate-300">
                     <CheckCircle className="w-5 h-5 text-primary mr-3" />
                     {item}
@@ -339,22 +339,22 @@ export default function Home() {
                 className="w-full h-14 rounded-2xl border-white/10 hover:bg-white/5"
                 onClick={() => handleTrackingClick("standard")}
               >
-                Choose Standard
+                Choisir Standard
               </Button>
             </motion.div>
 
             <motion.div whileHover={{ y: -10 }} className="bg-gradient-to-br from-primary to-blue-600 rounded-[2.5rem] p-10 text-left relative overflow-hidden shadow-2xl shadow-primary/20 flex flex-col">
               <div className="absolute top-0 right-0 p-8">
-                <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-widest">Most Popular</div>
+                <div className="bg-white/20 backdrop-blur-md rounded-full px-4 py-1 text-[10px] font-bold uppercase tracking-widest">Le Plus Populaire</div>
               </div>
               <div className="relative z-10 flex flex-col h-full">
                 <div className="mb-8">
-                  <Badge className="bg-white/20 text-white border-none mb-4">Priority Access</Badge>
+                  <Badge className="bg-white/20 text-white border-none mb-4">Accès Premium</Badge>
                   <div className="text-5xl font-bold mb-2 text-white">$32.90</div>
-                  <div className="text-blue-100">Priority tracking</div>
+                  <div className="text-blue-100">Traçage prioritaire</div>
                 </div>
                 <ul className="space-y-4 mb-12 flex-1">
-                  {['Unlimited Devices', 'Highest Accuracy Mode', '24/7 Priority Support', 'Automated Updates', 'Remote Lock/Wipe'].map((item, i) => (
+                  {['Appareils Illimités', 'Mode Haute Précision', 'Support Prioritaire 24/7', 'Mises à jour Automatiques', 'Verrouillage à Distance'].map((item, i) => (
                     <li key={i} className="flex items-center text-white">
                       <CheckCircle className="w-5 h-5 text-blue-200 mr-3" />
                       {item}
@@ -366,7 +366,7 @@ export default function Home() {
                   className="w-full h-14 rounded-2xl bg-white text-primary hover:bg-slate-100 font-bold"
                   onClick={() => handleTrackingClick("priority")}
                 >
-                  Get Started Now
+                  Démarrer Maintenant
                 </Button>
               </div>
             </motion.div>

@@ -63,33 +63,40 @@ export function AuthenticationProcess({ isVisible, onAuthComplete }: Authenticat
 
   return (
     <div className="mb-8 animate-in slide-in-from-bottom-5 duration-300">
-      <Card className="bg-slate-800/50 backdrop-blur-lg border-slate-700/50">
+      <Card className="bg-[#0A0E1A]/60 backdrop-blur-xl border-white/5 rounded-[2.5rem]">
         <CardContent className="p-8">
-          <h2 className="text-2xl font-bold mb-6 flex items-center">
-            <Shield className="text-blue-400 mr-3" size={24} />
-            Authentication in Progress
-          </h2>
+          <div className="flex flex-col items-center text-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center text-primary mb-4 animate-pulse">
+              <Shield size={32} />
+            </div>
+            <h2 className="text-2xl font-bold tracking-tight">
+              Establishing Secure Link
+            </h2>
+            <p className="text-slate-400 text-sm mt-2">Satellite synchronization in progress</p>
+          </div>
           
-          <div className="space-y-4">
+          <div className="space-y-3">
             {steps.map((step) => (
               <div 
                 key={step.id}
-                className={`flex items-center p-4 bg-slate-700/50 rounded-lg transition-opacity duration-300 ${
-                  step.completed || step.active ? 'opacity-100' : 'opacity-50'
+                className={`flex items-center p-4 bg-white/[0.02] border border-white/5 rounded-2xl transition-all duration-300 ${
+                  step.completed || step.active ? 'opacity-100' : 'opacity-40'
                 }`}
               >
                 <div className="mr-4">
                   {step.active && !step.completed && (
-                    <Loader2 className="text-blue-400 animate-spin" size={20} />
+                    <Loader2 className="text-primary animate-spin" size={18} />
                   )}
                   {step.completed && (
-                    <Check className="text-emerald-400" size={20} />
+                    <div className="bg-emerald-500/20 p-1 rounded-full">
+                      <Check className="text-emerald-400" size={14} />
+                    </div>
                   )}
                   {!step.active && !step.completed && (
-                    <div className="w-5 h-5 rounded-full border-2 border-slate-500"></div>
+                    <div className="w-4 h-4 rounded-full border border-white/10"></div>
                   )}
                 </div>
-                <span className={step.completed ? 'text-emerald-400' : 'text-white'}>
+                <span className={`text-sm font-medium ${step.completed ? 'text-emerald-400' : 'text-slate-200'}`}>
                   {step.message}
                 </span>
               </div>

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "@/hooks/use-toast";
 import { 
   MapPin, 
   RefreshCw, 
@@ -20,7 +21,8 @@ import {
   ShieldAlert,
   Users,
   Share2,
-  Ghost
+  Ghost,
+  Radio
 } from "lucide-react";
 import { mockDeviceInfo, generateLomeLocation } from "@/lib/device-data";
 import { ActivityEntry, createActivityEntry } from "@/lib/tracking-utils";
@@ -87,7 +89,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         
         // System 3: Breadcrumbs - store trail if family plan or priority
         if (isFamilyPlan || isPriority) {
-          setBreadcrumbTrail(trail => [...trail, [newLat, newLng]].slice(-20));
+          setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
         addActivity('Device moving - tracking update', 'info');
@@ -243,23 +245,40 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                 />
                 
                 {/* Floating Map Stats */}
-                <div className="absolute bottom-6 left-6 right-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {[
-                    { label: 'Battery', value: mockDeviceInfo.battery, icon: Battery, color: 'emerald' },
-                    { label: 'Network', value: mockDeviceInfo.network, icon: Signal, color: 'blue' },
-                    { label: 'Status', value: mockDeviceInfo.lockStatus, icon: LockKeyhole, color: 'amber' },
-                    { label: 'Signal', value: 'Excellent', icon: Activity, color: 'primary' }
-                  ].map((stat, i) => (
-                    <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex items-center space-x-3 shadow-2xl">
-                      <div className={`w-8 h-8 rounded-lg bg-${stat.color}-500/10 text-${stat.color}-400 flex items-center justify-center shrink-0`}>
-                        <stat.icon size={16} />
+                <div className="absolute top-6 left-6 right-6 flex justify-between items-start pointer-events-none">
+                  <div className="flex flex-col gap-3">
+                    {[
+                      { label: 'Battery', value: '36%', icon: Battery, color: 'emerald' },
+                      { label: 'Status', value: 'Locked', icon: LockKeyhole, color: 'white' }
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-3 pr-6 rounded-2xl flex items-center space-x-3 shadow-2xl pointer-events-auto">
+                        <div className={`w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 ${stat.color === 'emerald' ? 'text-emerald-400' : 'text-white'}`}>
+                          <stat.icon size={20} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
+                          <p className="text-base font-bold">{stat.value}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 truncate">{stat.label}</p>
-                        <p className="text-sm font-bold truncate">{stat.value}</p>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col gap-3 items-end">
+                    {[
+                      { label: 'Signal', value: 'Excellent', icon: Signal, color: 'blue' },
+                      { label: 'Pulse', value: 'Active', icon: Activity, color: 'white' }
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-[#0A0E1A]/90 backdrop-blur-md border border-white/10 p-3 pl-6 rounded-2xl flex items-center space-x-3 shadow-2xl pointer-events-auto">
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
+                          <p className="text-base font-bold">{stat.value}</p>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0 text-blue-400">
+                          <stat.icon size={20} />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -352,7 +371,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
           </Card>
 
           {/* Activity Log */}
-          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8 h-[400px] flex flex-col">
+          <Card className="bg-white/5 border-white/5 rounded-[2.5rem] p-8 h-[450px] flex flex-col">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-bold flex items-center">
                 <History className="text-primary mr-3" size={24} />
@@ -369,17 +388,17 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                       key={activity.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="flex items-start space-x-4"
+                      className="group"
                     >
-                      <div className={`w-1.5 h-1.5 rounded-full mt-2 shrink-0 ${
-                        activity.type === 'success' ? 'bg-emerald-500' :
-                        activity.type === 'error' ? 'bg-red-500' :
-                        activity.type === 'warning' ? 'bg-amber-500' : 'bg-primary'
-                      }`} />
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium leading-tight">{activity.message}</p>
-                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mt-1">{activity.time}</p>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className={`text-sm font-medium ${
+                          activity.type === 'warning' ? 'text-amber-400' : 'text-slate-200'
+                        }`}>
+                          {activity.message}
+                        </p>
+                        {activity.type === 'warning' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />}
                       </div>
+                      <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">{activity.time}</p>
                     </motion.div>
                   ))}
                 </AnimatePresence>

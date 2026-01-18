@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +30,7 @@ import { useToast } from "@/hooks/use-toast";
 export default function Home() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { data: user } = useQuery({ 
+  const { data: user } = useQuery<any>({ 
     queryKey: ["/api/user"],
     retry: false
   });
@@ -267,7 +267,7 @@ export default function Home() {
                 onClick={() => apiRequest("POST", "/api/logout").then(() => window.location.reload())}
                 className="w-full sm:w-auto"
               >
-                Logout ({user.email})
+                Logout ({user?.email})
               </Button>
             )}
           </div>

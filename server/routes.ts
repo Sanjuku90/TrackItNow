@@ -9,8 +9,13 @@ import {
 } from "./email";
 import { generateLomeLocation } from "../client/src/lib/device-data";
 import { insertPurchaseSchema } from "@shared/schema";
+import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup Auth
+  await setupAuth(app);
+  registerAuthRoutes(app);
+
   // Health check endpoint
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

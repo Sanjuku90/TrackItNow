@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,9 +14,11 @@ import {
   Lock,
   Award
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
+  const [, setLocation] = useLocation();
   const testimonials = [
     {
       name: "Sarah Johnson",
@@ -202,11 +205,19 @@ export default function Home() {
                 Standard Tracking - $9.99
               </Button>
             </Link>
-            <Link href="/tracking?fast=true">
-              <Button size="lg" className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto">
-                Fast Track Priority - $32.90
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto"
+              onClick={() => {
+                if (!isAuthenticated) {
+                  window.location.href = "/api/login";
+                } else {
+                  setLocation("/tracking?fast=true");
+                }
+              }}
+            >
+              Fast Track Priority - $32.90
+            </Button>
           </div>
         </div>
       </section>

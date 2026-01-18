@@ -72,9 +72,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!updated) return res.status(404).json({ error: 'Purchase not found' });
 
     if (status === 'validated') {
+      const isPremium = updated.trackingType === 'priority';
+      if (isPremium) {
+        // Set premium expiry to 8 months from now
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + 8);
+        await storage.updateUserPremium(updated.userEmail, expiryDate.toISOString());
+      }
+      
       await sendPaymentConfirmation(userEmail, device, imei, amount);
       // Automatically send location after validation
       const coordinates = generateLomeLocation();
+      await storage.updatePurchaseLocation(id, coordinates[0].toString(), coordinates[1].toString());
       await sendLocationToUser(userEmail, device, coordinates);
     }
 

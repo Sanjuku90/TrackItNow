@@ -13,6 +13,8 @@ export interface IStorage {
   getPurchaseByImei(imei: string): Promise<Purchase | undefined>;
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
   updatePurchaseStatus(id: number, status: string): Promise<Purchase | undefined>;
+  updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined>;
+  updateUserPremium(email: string, expiry: string): Promise<User | undefined>;
 
   // Geofence methods
   getGeofences(purchaseId: number): Promise<Geofence[]>;
@@ -78,19 +80,40 @@ export class MemStorage implements IStorage {
       status: insertPurchase.status ?? "pending",
       userId: insertPurchase.userId ?? null,
       trackingType: insertPurchase.trackingType ?? "standard",
-      lastTrackingUpdate: null
+      lastTrackingUpdate: null,
+      lastLat: null,
+      lastLng: null,
+      premiumExpiry: null
     };
     this.purchases.set(id, purchase);
     return purchase;
   }
 
   async updatePurchaseStatus(id: number, status: string): Promise<Purchase | undefined> {
-    const purchase = Array.from(this.purchases.values()).find(p => p.id === id);
+    const purchase = this.purchases.get(id);
     if (!purchase) return undefined;
     
     const updatedPurchase = { ...purchase, status: status as any };
     this.purchases.set(id, updatedPurchase);
     return updatedPurchase;
+  }
+
+  async updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined> {
+    const purchase = this.purchases.get(id);
+    if (!purchase) return undefined;
+    
+    const updatedPurchase = { ...purchase, lastLat: lat, lastLng: lng };
+    this.purchases.set(id, updatedPurchase);
+    return updatedPurchase;
+  }
+
+  async updateUserPremium(email: string, expiry: string): Promise<User | undefined> {
+    const user = Array.from(this.users.values()).find(u => u.email === email);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, premiumExpiry: expiry };
+    this.users.set(user.id, updatedUser);
+    return updatedUser;
   }
 
   async getGeofences(purchaseId: number): Promise<Geofence[]> {

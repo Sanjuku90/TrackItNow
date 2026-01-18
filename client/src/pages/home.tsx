@@ -51,7 +51,7 @@ export default function Home() {
     e.preventDefault();
     try {
       await apiRequest("POST", isLogin ? "/api/login" : "/api/register", { email, password });
-      window.location.reload();
+      setLocation("/dashboard");
     } catch (e: any) {
       toast({ title: "Auth failed", description: e.message, variant: "destructive" });
     }
@@ -126,7 +126,14 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-slate-400 hidden sm:inline">{user.email}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setLocation("/dashboard")}
+                    className="hover:bg-white/5 text-primary font-bold"
+                  >
+                    Dashboard
+                  </Button>
                   <Button 
                     variant="ghost" 
                     size="sm" 

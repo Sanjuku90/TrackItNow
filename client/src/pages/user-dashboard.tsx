@@ -53,6 +53,22 @@ export default function UserDashboard() {
       icon: Zap,
       color: "emerald",
       popular: true
+    },
+    {
+      id: "family",
+      name: "Plan Famille",
+      price: "$49.90",
+      features: ["Jusqu'à 5 appareils", "Tableau de bord unique", "Localisation partagée", "Contrôle parental"],
+      icon: Smartphone,
+      color: "blue"
+    },
+    {
+      id: "temporary",
+      name: "Partage Temporaire",
+      price: "$4.99",
+      features: ["Lien sécurisé (1h-2h)", "Sans application", "Usage unique", "Accès navigateur"],
+      icon: Clock,
+      color: "orange"
     }
   ];
 

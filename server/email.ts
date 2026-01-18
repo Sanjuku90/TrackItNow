@@ -8,6 +8,9 @@ const GMAIL_APP_PASSWORD = 'rhlz xgeg chxh yoic';
 // Configuration du transporteur Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: GMAIL_USER,
     pass: GMAIL_APP_PASSWORD

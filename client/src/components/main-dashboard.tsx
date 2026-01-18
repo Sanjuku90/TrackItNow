@@ -383,7 +383,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             <div className="flex items-center justify-between mb-6 sm:mb-8">
               <h3 className="text-lg sm:text-xl font-bold flex items-center">
                 <History className="text-primary mr-3" size={20} />
-                Terminal Logs
+                Historique d'activité
               </h3>
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
@@ -404,7 +404,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
                           activity.type === 'warning' ? 'text-amber-400' : 'text-slate-200'
                         }`}>
                           {activity.message}
-                          {activity.location && <MapPin size={12} className="inline ml-2 text-primary/60" />}
+                          {activity.location && <MapPin size={12} className="inline ml-2 text-primary/60 group-hover:text-primary transition-colors" />}
                         </p>
                         {activity.type === 'warning' && <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />}
                       </div>

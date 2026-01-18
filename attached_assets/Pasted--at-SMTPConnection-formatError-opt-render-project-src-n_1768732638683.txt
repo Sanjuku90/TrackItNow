@@ -1,0 +1,27 @@
+    at SMTPConnection._formatError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+    at SMTPConnection._onError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:795:20)
+    at Timeout.<anonymous> (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:237:22)
+    at listOnTimeout (node:internal/timers:588:17)
+    at process.processTimers (node:internal/timers:523:7) {
+  code: 'ETIMEDOUT',
+  command: 'CONN'
+}
+Please ensure GMAIL_APP_PASSWORD environment variable is set correctly.
+==> Detected service running on port 10000
+==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+10:27:58 AM [express] GET /api/user 401 in 2ms :: {"error":"Not logged in"}
+10:28:09 AM [express] GET /api/user 401 in 1ms :: {"error":"Not logged in"}
+10:29:05 AM [express] POST /api/login 401 in 1ms :: {"error":"Invalid email or password"}
+10:29:19 AM [express] GET /api/user 401 in 1ms :: {"error":"Not logged in"}
+10:29:20 AM [express] POST /api/register 200 in 2ms :: {"email":"","password":"","isAdmin":false,"id"…
+10:29:21 AM [express] GET /api/user 200 in 2ms :: {"email":"","password":"","isAdmin":false,"id":1}
+10:31:33 AM [express] POST /api/login 401 in 0ms :: {"error":"Invalid email or password"}
+10:31:39 AM [express] POST /api/register 200 in 0ms :: {"email":"a@gmail.com","password":"aaaaaa","is…
+10:31:40 AM [express] GET /api/user 200 in 1ms :: {"email":"a@gmail.com","password":"aaaaaa","isAdmin…
+10:32:58 AM [express] GET /api/user 304 in 0ms :: {"email":"","password":"","isAdmin":false,"id":1}
+10:33:10 AM [express] GET /api/admin/purchases 200 in 1ms :: []
+10:33:38 AM [express] GET /api/admin/purchases 304 in 1ms :: []
+10:33:53 AM [express] GET /api/admin/purchases 200 in 0ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:07 AM [express] GET /api/admin/purchases 200 in 1ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:13 AM [express] GET /api/admin/purchases 200 in 1ms :: [{"userId":null,"device":"Samsung Galaxy…
+10:34:19 AM [express] GET /api/ad

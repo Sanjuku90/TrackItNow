@@ -42,8 +42,6 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     createActivityEntry('Appareil verrouillé à distance', 'warning')
   ]);
   const [isPriority, setIsPriority] = useState(false);
-  const [isFamilyPlan, setIsFamilyPlan] = useState(false);
-  const [isGhostLink, setIsGhostLink] = useState(false);
   const [geofences, setGeofences] = useState<{name: string, lat: number, lng: number, radius: number}[]>([]);
   const [breadcrumbTrail, setBreadcrumbTrail] = useState<[number, number][]>([]);
 
@@ -52,31 +50,13 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     if (params.get('fast') === 'true') {
       setIsPriority(true);
     }
-    
-    // Check for specific plans
-    const plan = params.get('plan');
-    if (plan === 'family') {
-      setIsFamilyPlan(true);
-      setGeofences([
-        { name: "Maison", lat: currentLocation[0], lng: currentLocation[1], radius: 200 },
-        { name: "École", lat: currentLocation[0] + 0.005, lng: currentLocation[1] + 0.005, radius: 300 }
-      ]);
-    }
-    
-    if (plan === 'temporary') {
-      setIsGhostLink(true);
-    }
   }, []);
 
   const generateGhostLink = () => {
-    const token = Math.random().toString(36).substring(2, 15);
-    const link = `${window.location.origin}/ghost/${token}`;
-    navigator.clipboard.writeText(link);
     toast({
-      title: "Ghost Link Generated",
-      description: "Secure sharing link copied to clipboard. Expires in 2 hours.",
+      title: "Action indisponible",
+      description: "La génération de lien Ghost n'est disponible que dans le plan Premium.",
     });
-    addActivity('Ghost Link generated for secure sharing', 'success');
   };
 
   useEffect(() => {
@@ -87,25 +67,13 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         const newLat = prev[0] + direction[0];
         const newLng = prev[1] + direction[1];
         
-        // System 3: Breadcrumbs - store trail if family plan or priority
-        if (isFamilyPlan || isPriority) {
+        // System 3: Breadcrumbs - store trail if priority
+        if (isPriority) {
           setBreadcrumbTrail(trail => [...trail, [newLat, newLng]] as [number, number][]);
         }
 
         addActivity('Mise à jour du traçage - Appareil en mouvement', 'info', [newLat, newLng]);
         
-        // System 1 & 4: Geofencing & Check-in
-        if (isFamilyPlan) {
-          geofences.forEach(gf => {
-            const dist = Math.sqrt(Math.pow(newLat - gf.lat, 2) + Math.pow(newLng - gf.lng, 2)) * 111000;
-            if (dist > gf.radius && Math.random() > 0.8) {
-              addActivity(`ALERTE: Sortie de zone - ${gf.name}`, 'error');
-            } else if (dist < 50 && Math.random() > 0.9) {
-              addActivity(`CHECK-IN: Arrivé à ${gf.name}`, 'success');
-            }
-          });
-        }
-
         if (Math.random() > 0.7) {
           addActivity('Alerte de proximité : Cible entrée dans le périmètre de sécurité', 'warning');
           try {
@@ -124,7 +92,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     }, isPriority ? 3000 : 5000);
 
     return () => clearInterval(moveInterval);
-  }, [isVisible, isPriority, isFamilyPlan, direction, geofences]);
+  }, [isVisible, isPriority, direction, geofences]);
 
   const addActivity = (message: string, type: ActivityEntry['type'] = 'info', location?: [number, number]) => {
     const newActivity = createActivityEntry(message, type, location);
@@ -157,14 +125,12 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
       ring: 'L\'appareil sonne actuellement...',
       lock: 'L\'appareil a été verrouillé à distance',
       wipe: 'Effacement des données initié - Cette action est irréversible !',
-      panic: 'MODE URGENCE : Traçage haute fréquence activé, micro/caméra ouverts'
     };
 
     const types: Record<string, ActivityEntry['type']> = {
       ring: 'info',
       lock: 'warning', 
       wipe: 'error',
-      panic: 'error'
     };
 
     addActivity(messages[action as keyof typeof messages], types[action]);
@@ -198,37 +164,19 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
     map.panTo(currentLocation);
 
     // System 3: Breadcrumbs - draw trail
-    if ((isFamilyPlan || isPriority) && breadcrumbTrail.length > 1) {
+    if (isPriority && breadcrumbTrail.length > 1) {
       L.polyline(breadcrumbTrail, {
-        color: isPriority ? '#3b82f6' : '#10b981',
+        color: '#3b82f6',
         weight: 3,
         opacity: 0.5,
         dashArray: '5, 10'
       }).addTo(map);
     }
 
-    if (isFamilyPlan) {
-      geofences.forEach(gf => {
-        L.circle([gf.lat, gf.lng], {
-          color: '#3b82f6',
-          fillColor: '#3b82f6',
-          fillOpacity: 0.1,
-          radius: gf.radius
-        }).addTo(map);
-
-        L.marker([gf.lat, gf.lng], {
-          icon: L.divIcon({
-            html: `<div class="bg-blue-500/20 p-1 rounded-full border border-blue-500/50"><div class="w-2 h-2 bg-blue-500 rounded-full"></div></div>`,
-            className: 'geofence-marker'
-          })
-        }).addTo(map).bindPopup(gf.name);
-      });
-    }
-
     return () => {
       map.remove();
     };
-  }, [isVisible, currentLocation, isFamilyPlan, geofences]);
+  }, [isVisible, currentLocation, geofences]);
 
   if (!isVisible) return null;
 
@@ -238,9 +186,7 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
         <div>
           <div className="flex items-center space-x-3 mb-2">
             <Badge className="bg-emerald-500/20 text-emerald-400 border-none px-3">Live Tracking</Badge>
-            {isPriority && <Badge className="bg-primary/20 text-primary border-none px-3">Fast Track Priority</Badge>}
-            {isFamilyPlan && <Badge className="bg-blue-500/20 text-blue-400 border-none px-3 flex items-center gap-1"><Users size={12}/> Family Circle</Badge>}
-            {isGhostLink && <Badge className="bg-purple-500/20 text-purple-400 border-none px-3 flex items-center gap-1"><Ghost size={12}/> Ghost Link Active</Badge>}
+            {isPriority && <Badge className="bg-primary/20 text-primary border-none px-3">Premium Fast Track</Badge>}
           </div>
           <h2 className="text-3xl font-bold tracking-tight">Terminal de Suivi</h2>
         </div>
@@ -343,34 +289,6 @@ export function MainDashboard({ isVisible }: MainDashboardProps) {
             </h3>
             
             <div className="space-y-4">
-              {isFamilyPlan && (
-                <button
-                  onClick={() => executeAction('panic')}
-                  className="w-full group text-left p-4 rounded-3xl bg-red-500/10 border border-red-500/20 hover:border-red-500/40 hover:bg-red-500/20 transition-all duration-300 flex items-center space-x-4 mb-2"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-red-500/20 text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                    <ShieldAlert size={20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm truncate text-red-300">MODE PANIQUE</h4>
-                    <p className="text-xs text-red-400/60 truncate">Activez l'urgence maximale</p>
-                  </div>
-                </button>
-              )}
-              {isGhostLink && (
-                <button
-                  onClick={generateGhostLink}
-                  className="w-full group text-left p-4 rounded-3xl bg-purple-500/10 border border-purple-500/20 hover:border-purple-500/40 hover:bg-purple-500/20 transition-all duration-300 flex items-center space-x-4 mb-4"
-                >
-                  <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                    <Share2 size={20} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-sm truncate text-purple-300">Générer Lien Ghost</h4>
-                    <p className="text-xs text-purple-400/60 truncate">Partage d'accès temporaire sécurisé</p>
-                  </div>
-                </button>
-              )}
               {[
                 { id: 'ring', name: 'Alarme d\'Urgence', desc: 'Déclencher la sonnerie au volume max', icon: Volume2, color: 'emerald' },
                 { id: 'lock', name: 'Verrouillage Sécure', desc: 'Verrouiller avec message personnalisé', icon: Lock, color: 'amber' },

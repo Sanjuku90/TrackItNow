@@ -17,7 +17,7 @@ export const purchases = pgTable("purchases", {
   amount: integer("amount").notNull(),
   status: text("status", { enum: ["pending", "validated", "rejected", "suspended"] }).notNull().default("pending"),
   userEmail: text("user_email").notNull(),
-  trackingType: text("tracking_type", { enum: ["standard", "priority", "family", "temporary"] }).notNull().default("standard"),
+  trackingType: text("tracking_type", { enum: ["standard", "priority"] }).notNull().default("standard"),
   lastTrackingUpdate: text("last_tracking_update"),
 });
 

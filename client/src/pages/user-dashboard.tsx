@@ -78,7 +78,7 @@ export default function UserDashboard() {
 
   // Filter purchases for this user
   const recentTracking = userPurchases
-    .filter((p: any) => p.userEmail === user.email)
+    .filter((p: any) => p.userEmail.toLowerCase() === user.email.toLowerCase())
     .map((p: any) => ({
       id: `TRK-${p.id}`,
       device: p.device,

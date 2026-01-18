@@ -50,13 +50,14 @@ export default function Home() {
     }
   };
 
-  const handlePremiumClick = () => {
+  const handleTrackingClick = (planType: "standard" | "priority") => {
     if (!user) {
       setShowAuth(true);
     } else {
-      setLocation("/tracking?fast=true");
+      setLocation(planType === "priority" ? "/tracking?fast=true" : "/tracking");
     }
   };
+
   const testimonials = [
     {
       name: "Sarah Johnson",
@@ -249,14 +250,14 @@ export default function Home() {
               size="lg" 
               variant="secondary" 
               className="bg-white text-blue-600 hover:bg-slate-100 px-8 py-3 text-lg font-semibold w-full sm:w-auto"
-              onClick={() => setLocation("/tracking")}
+              onClick={() => handleTrackingClick("standard")}
             >
               Standard Tracking - $9.99
             </Button>
             <Button 
               size="lg" 
               className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-3 text-lg font-semibold w-full sm:w-auto"
-              onClick={handlePremiumClick}
+              onClick={() => handleTrackingClick("priority")}
             >
               Fast Track Priority - $32.90
             </Button>

@@ -45,15 +45,15 @@ export default function TrackingDashboard() {
   }, []);
 
   useEffect(() => {
-    if (isFastTrack && !isUserLoading && !user) {
+    if (!isUserLoading && !user) {
       toast({
         title: "Authentification requise",
-        description: "Veuillez vous connecter pour utiliser le plan Premium.",
+        description: "Veuillez vous connecter pour accéder au service de tracking.",
         variant: "destructive"
       });
       setLocation("/?auth=true");
     }
-  }, [isFastTrack, isUserLoading, user, setLocation, toast]);
+  }, [isUserLoading, user, setLocation, toast]);
 
   useEffect(() => {
     // Add Leaflet CSS and JS

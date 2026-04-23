@@ -1,8 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { users, purchases, geofences, ghostLinks, locationHistory, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink, type LocationHistory, type InsertLocationHistory } from "@shared/schema";
+import { users, purchases, geofences, ghostLinks, locationHistory, operationLogs, PURCHASE_STATUS_TRANSITIONS, type User, type InsertUser, type Purchase, type InsertPurchase, type Geofence, type InsertGeofence, type GhostLink, type InsertGhostLink, type LocationHistory, type InsertLocationHistory, type OperationLog } from "@shared/schema";
 import * as schema from "@shared/schema";
 import { pool } from "./db";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, lte, desc } from "drizzle-orm";
+
+export type PurchaseStatus = "pending" | "validated" | "rejected" | "suspended" | "expired";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -11,11 +13,26 @@ export interface IStorage {
   
   // Purchase methods
   getPurchases(): Promise<Purchase[]>;
+  getPurchase(id: number): Promise<Purchase | undefined>;
+  getPurchasesByUserEmail(email: string): Promise<Purchase[]>;
+  getActivePurchaseByImei(imei: string): Promise<Purchase | undefined>;
+  countActivePurchasesByEmail(email: string): Promise<number>;
   getPurchaseByImei(imei: string): Promise<Purchase | undefined>;
   createPurchase(purchase: InsertPurchase): Promise<Purchase>;
   updatePurchaseStatus(id: number, status: string): Promise<Purchase | undefined>;
+  transitionPurchaseStatus(
+    id: number,
+    newStatus: PurchaseStatus,
+    actor: { id?: number | null; email?: string | null; isAdmin: boolean; isSystem?: boolean },
+    reason?: string
+  ): Promise<Purchase>;
+  expireDuePurchases(): Promise<number>;
   updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined>;
   updateUserPremium(email: string, expiry: string): Promise<User | undefined>;
+
+  // Operation log methods
+  addOperationLog(log: Omit<OperationLog, "id">): Promise<OperationLog>;
+  getOperationLogs(purchaseId: number): Promise<OperationLog[]>;
 
   // Geofence methods
   getGeofences(purchaseId: number): Promise<Geofence[]>;
@@ -58,8 +75,31 @@ export class DatabaseStorage implements IStorage {
     return purchase;
   }
 
+  async getPurchase(id: number): Promise<Purchase | undefined> {
+    const [purchase] = await this.db.select().from(purchases).where(eq(purchases.id, id));
+    return purchase;
+  }
+
+  async getPurchasesByUserEmail(email: string): Promise<Purchase[]> {
+    return await this.db.select().from(purchases).where(eq(purchases.userEmail, email));
+  }
+
+  async getActivePurchaseByImei(imei: string): Promise<Purchase | undefined> {
+    const [purchase] = await this.db.select().from(purchases)
+      .where(and(eq(purchases.imei, imei), inArray(purchases.status, ["pending", "validated", "suspended"])));
+    return purchase;
+  }
+
+  async countActivePurchasesByEmail(email: string): Promise<number> {
+    const rows = await this.db.select().from(purchases)
+      .where(and(eq(purchases.userEmail, email), inArray(purchases.status, ["pending", "validated", "suspended"])));
+    return rows.length;
+  }
+
   async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
-    const [purchase] = await this.db.insert(purchases).values(insertPurchase).returning();
+    const values: any = { ...insertPurchase };
+    if (!values.createdAt) values.createdAt = new Date().toISOString();
+    const [purchase] = await this.db.insert(purchases).values(values).returning();
     return purchase;
   }
 
@@ -69,6 +109,73 @@ export class DatabaseStorage implements IStorage {
       .where(eq(purchases.id, id))
       .returning();
     return purchase;
+  }
+
+  async transitionPurchaseStatus(
+    id: number,
+    newStatus: PurchaseStatus,
+    actor: { id?: number | null; email?: string | null; isAdmin: boolean; isSystem?: boolean },
+    reason?: string
+  ): Promise<Purchase> {
+    const existing = await this.getPurchase(id);
+    if (!existing) throw new Error("Operation not found");
+
+    const allowed = PURCHASE_STATUS_TRANSITIONS[existing.status] || [];
+    if (!allowed.includes(newStatus)) {
+      throw new Error(`Invalid transition: ${existing.status} → ${newStatus}`);
+    }
+
+    if (!actor.isAdmin && !actor.isSystem) {
+      throw new Error("Only an administrator can change the operation status");
+    }
+
+    const [updated] = await this.db.update(purchases)
+      .set({ status: newStatus as any })
+      .where(eq(purchases.id, id))
+      .returning();
+
+    await this.addOperationLog({
+      purchaseId: id,
+      fromStatus: existing.status,
+      toStatus: newStatus,
+      actorId: actor.id ?? null,
+      actorEmail: actor.isSystem ? "system" : (actor.email ?? null),
+      reason: reason ?? null,
+      createdAt: new Date().toISOString(),
+    });
+
+    return updated;
+  }
+
+  async expireDuePurchases(): Promise<number> {
+    const now = new Date().toISOString();
+    const due = await this.db.select().from(purchases)
+      .where(and(
+        inArray(purchases.status, ["validated", "suspended"]),
+        lte(purchases.premiumExpiry, now),
+      ));
+    let count = 0;
+    for (const p of due) {
+      if (!p.premiumExpiry) continue;
+      try {
+        await this.transitionPurchaseStatus(p.id, "expired", { isAdmin: false, isSystem: true }, "Premium expired");
+        count++;
+      } catch (err) {
+        console.error(`Failed to expire purchase ${p.id}:`, err);
+      }
+    }
+    return count;
+  }
+
+  async addOperationLog(log: Omit<OperationLog, "id">): Promise<OperationLog> {
+    const [row] = await this.db.insert(operationLogs).values(log as any).returning();
+    return row;
+  }
+
+  async getOperationLogs(purchaseId: number): Promise<OperationLog[]> {
+    return await this.db.select().from(operationLogs)
+      .where(eq(operationLogs.purchaseId, purchaseId))
+      .orderBy(desc(operationLogs.id));
   }
 
   async updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined> {

@@ -17,12 +17,27 @@ import {
   Clock,
   ArrowRight
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, Link } from "wouter";
 import { motion } from "framer-motion";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 import { useToast } from "@/hooks/use-toast";
+
+const STATUS_LABEL_FR: Record<string, string> = {
+  pending: "En attente",
+  validated: "Active",
+  rejected: "Rejetée",
+  suspended: "Suspendue",
+  expired: "Expirée",
+};
+const STATUS_COLOR: Record<string, string> = {
+  pending: "bg-amber-500/20 text-amber-400",
+  validated: "bg-emerald-500/20 text-emerald-400",
+  rejected: "bg-red-500/20 text-red-400",
+  suspended: "bg-orange-500/20 text-orange-400",
+  expired: "bg-slate-500/20 text-slate-400",
+};
 
 export default function UserDashboard() {
   const [, setLocation] = useLocation();
@@ -33,8 +48,20 @@ export default function UserDashboard() {
   });
 
   const { data: userPurchases = [] } = useQuery<any[]>({
-    queryKey: ["/api/admin/purchases"],
+    queryKey: ["/api/operations"],
     enabled: !!user,
+  });
+
+  const cancelOp = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/operations/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/operations"] });
+      toast({ title: "Opération annulée", description: "Votre demande a bien été annulée." });
+    },
+    onError: (e: any) => toast({ title: "Erreur", description: e.message, variant: "destructive" }),
   });
 
   if (isLoading) return <div className="min-h-screen bg-[#0A0E1A] flex items-center justify-center text-white">Loading...</div>;
@@ -76,16 +103,10 @@ export default function UserDashboard() {
     }
   ];
 
-  // Filter purchases for this user
-  const recentTracking = userPurchases
+  // Operations for this user
+  const operations = userPurchases
     .filter((p: any) => p.userEmail.toLowerCase() === user.email.toLowerCase())
-    .map((p: any) => ({
-      id: `TRK-${p.id}`,
-      device: p.device,
-      date: new Date().toLocaleDateString(), // In a real app we'd have a createdAt
-      status: p.status === 'validated' ? 'Active' : 'Pending',
-      accuracy: p.status === 'validated' ? 'High' : 'N/A'
-    }));
+    .sort((a: any, b: any) => b.id - a.id);
 
   return (
     <div className="min-h-screen bg-[#0A0E1A] text-slate-50">
@@ -159,40 +180,62 @@ export default function UserDashboard() {
                 Recent Activity
               </h3>
               <div className="space-y-4">
-                {recentTracking.length > 0 ? (
-                  recentTracking.map((trk: any) => (
-                    <div 
-                      key={trk.id} 
-                      className="p-4 bg-white/5 rounded-2xl hover:bg-white/[0.08] transition-colors group cursor-pointer border border-white/5 hover:border-primary/20"
-                      onClick={() => handleViewTracking(trk.id)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">{trk.id}</span>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-[8px] py-0 px-1 border-primary/30 text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                            REVOIR
-                          </Badge>
-                          <Badge className={trk.status === 'Active' ? 'bg-emerald-500/20 text-emerald-400 border-none' : 'bg-slate-500/20 text-slate-400 border-none'}>
-                            {trk.status}
+                {operations.length > 0 ? (
+                  operations.map((op: any) => {
+                    const dateStr = op.createdAt && op.createdAt !== "1970-01-01T00:00:00.000Z"
+                      ? new Date(op.createdAt).toLocaleDateString()
+                      : "—";
+                    const canViewTracking = op.status === "validated";
+                    const canCancel = op.status === "pending";
+                    return (
+                      <div
+                        key={op.id}
+                        className="p-4 bg-white/5 rounded-2xl border border-white/5 hover:border-primary/20 transition-colors"
+                        data-testid={`card-operation-${op.id}`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-slate-500 uppercase tracking-tighter">TRK-{op.id}</span>
+                          <Badge className={`${STATUS_COLOR[op.status] ?? 'bg-slate-500/20 text-slate-400'} border-none`} data-testid={`badge-status-${op.id}`}>
+                            {STATUS_LABEL_FR[op.status] ?? op.status}
                           </Badge>
                         </div>
+                        <div className="font-bold text-sm mb-1">{op.device}</div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] text-slate-500">{dateStr}</span>
+                          <span className="text-[10px] text-slate-400">{op.trackingType}</span>
+                        </div>
+                        <div className="flex gap-2">
+                          {canViewTracking && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 h-8 text-xs"
+                              onClick={() => handleViewTracking(`TRK-${op.id}`)}
+                              data-testid={`button-view-${op.id}`}
+                            >
+                              Voir le suivi
+                            </Button>
+                          )}
+                          {canCancel && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="flex-1 h-8 text-xs text-red-400 hover:text-red-300"
+                              disabled={cancelOp.isPending}
+                              onClick={() => cancelOp.mutate(op.id)}
+                              data-testid={`button-cancel-${op.id}`}
+                            >
+                              Annuler
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <div className="font-bold text-sm mb-1">{trk.device}</div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-slate-500">{trk.date}</span>
-                        <span className="text-[10px] text-primary font-bold">Accuracy: {trk.accuracy}</span>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <div className="p-8 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
-                    <p className="text-sm text-slate-500">Aucun historique disponible pour le moment.</p>
+                    <p className="text-sm text-slate-500">Aucune opération pour le moment.</p>
                   </div>
-                )}
-                {recentTracking.length > 0 && (
-                  <Button variant="ghost" className="w-full text-xs text-slate-500 hover:text-white mt-2">
-                    View Full History
-                  </Button>
                 )}
               </div>
             </Card>

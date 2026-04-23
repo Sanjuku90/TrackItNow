@@ -77,6 +77,17 @@ app.use((req, res, next) => {
     }
   }, 1000 * 60 * 60 * 4); // Every 4 hours
 
+  // Hourly job: expire premium operations whose expiry has passed
+  setInterval(async () => {
+    try {
+      const { storage } = await import("./storage");
+      const expired = await storage.expireDuePurchases();
+      if (expired > 0) log(`Auto-expired ${expired} operation(s)`);
+    } catch (error) {
+      console.error("Error in expiration task:", error);
+    }
+  }, 1000 * 60 * 60); // Every hour
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";

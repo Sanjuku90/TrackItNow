@@ -1,23 +1,35 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { pool } from "./db";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const SessionStore = MemoryStore(session);
+const isProd = process.env.NODE_ENV === "production";
+if (isProd) app.set("trust proxy", 1);
+
+const sessionStore = isProd
+  ? new (connectPgSimple(session))({ pool, tableName: "session", createTableIfMissing: true })
+  : new (MemoryStore(session))({ checkPeriod: 86400000 });
+
 app.use(
   session({
-    cookie: { maxAge: 86400000 },
-    store: new SessionStore({
-      checkPeriod: 86400000,
-    }),
+    name: "trackit.sid",
+    cookie: {
+      maxAge: 86400000,
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+    },
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
-    secret: "keyboard cat",
+    secret: process.env.SESSION_SECRET || "keyboard cat",
   })
 );
 

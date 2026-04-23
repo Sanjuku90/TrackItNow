@@ -138,7 +138,7 @@ export default function Terms() {
                     <div>
                       <h3 className="text-lg font-semibold text-white mb-3">Pricing & Billing</h3>
                       <ul className="space-y-2">
-                        <li>• Service fee: $9.99 USD per tracking request</li>
+                        <li>• Service fee: $16.99 USD per tracking request</li>
                         <li>• Payment processing via secure cryptocurrency (USDT)</li>
                         <li>• All fees are non-refundable once service is initiated</li>
                         <li>• Pricing subject to change with 30 days notice</li>
@@ -180,7 +180,7 @@ export default function Terms() {
                     <p className="text-red-300 text-sm">
                       <strong>Maximum Liability:</strong> Our total liability for any claims arising 
                       from the use of our services is limited to the amount paid for the specific 
-                      service in question, not to exceed $9.99 USD.
+                      service in question, not to exceed $16.99 USD.
                     </p>
                   </div>
                 </div>

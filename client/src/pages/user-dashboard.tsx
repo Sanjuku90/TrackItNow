@@ -58,7 +58,7 @@ export default function UserDashboard() {
     {
       id: "standard",
       name: "Standard Tracking",
-      price: "$9.99",
+      price: "$16.99",
       features: ["Single Device", "Real-time Location", "Standard Support"],
       icon: Satellite,
       color: "blue",
@@ -67,7 +67,7 @@ export default function UserDashboard() {
     {
       id: "priority",
       name: "Fast Track Priority",
-      price: "$32.90",
+      price: "$35.90",
       features: ["Unlimited Devices", "Highest Accuracy", "24/7 Priority Support", "Remote Lock/Wipe"],
       icon: Zap,
       color: "emerald",

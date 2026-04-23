@@ -268,7 +268,7 @@ export default function TrackingDashboard() {
                   <PaymentSection
                     isVisible={true}
                     onPaymentComplete={handlePaymentComplete}
-                    amount={isFastTrack ? 32.90 : 9.99}
+                    amount={isFastTrack ? 35.90 : 16.99}
                     device={selectedDevice}
                     userEmail={user?.email || ""}
                     trackingType={isFastTrack ? "priority" : "standard"}

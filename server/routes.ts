@@ -138,7 +138,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create a pending purchase record
       const isPremium = req.body.isFastTrack === true || req.body.platform === 'ios' || req.body.platform === 'android';
-      const amount = req.body.isFastTrack ? 32.90 : 9.99;
+      const amount = req.body.isFastTrack ? 35.90 : 16.99;
       const imei = "TRACK-" + Math.random().toString(36).substring(2, 10).toUpperCase();
       
       const purchase = await storage.createPurchase({
@@ -272,7 +272,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       userId: null,
       device: "Test Device",
       imei: "TEST-" + Math.random().toString(36).substring(2, 6).toUpperCase(),
-      amount: 999,
+      amount: 1699,
       status: "pending",
       userEmail: "test@example.com",
       trackingType: "standard"

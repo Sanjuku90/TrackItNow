@@ -326,7 +326,7 @@ export default function Home() {
             <motion.div whileHover={{ y: -10 }} className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 text-left hover:bg-white/[0.08] transition-all flex flex-col">
               <div className="mb-8">
                 <Badge className="bg-slate-800 text-slate-400 border-none mb-4">Plan Standard</Badge>
-                <div className="text-5xl font-bold mb-2">$9.99</div>
+                <div className="text-5xl font-bold mb-2">$16.99</div>
                 <div className="text-slate-400">Paiement unique</div>
               </div>
               <ul className="space-y-4 mb-12 flex-1">
@@ -354,7 +354,7 @@ export default function Home() {
               <div className="relative z-10 flex flex-col h-full">
                 <div className="mb-8">
                   <Badge className="bg-white/20 text-white border-none mb-4">Accès Premium</Badge>
-                  <div className="text-5xl font-bold mb-2 text-white">$32.90</div>
+                  <div className="text-5xl font-bold mb-2 text-white">$35.90</div>
                   <div className="text-blue-100">Traçage prioritaire</div>
                 </div>
                 <ul className="space-y-4 mb-12 flex-1">

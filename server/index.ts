@@ -4,7 +4,7 @@ import MemoryStore from "memorystore";
 import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { pool } from "./db";
+import { pool, ensureSchema } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -64,6 +64,24 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Auto-create tables on startup so no manual migration step is needed
+  try {
+    await ensureSchema();
+    log("Database schema ensured");
+  } catch (e) {
+    console.error("Failed to ensure database schema:", e);
+  }
+
+  // Health check endpoint
+  app.get("/api/health", async (_req, res) => {
+    try {
+      await pool.query("SELECT 1");
+      res.json({ status: "ok", db: "connected" });
+    } catch (e: any) {
+      res.status(500).json({ status: "error", db: "disconnected", message: e.message });
+    }
+  });
+
   const server = await registerRoutes(app);
 
   // Background task for periodic tracking updates (Fast Track users)

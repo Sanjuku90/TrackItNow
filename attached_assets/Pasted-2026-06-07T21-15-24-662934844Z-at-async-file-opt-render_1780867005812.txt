@@ -1,0 +1,50 @@
+2026-06-07T21:15:24.662934844Z     at async file:///opt/render/project/src/dist/index.js:1324:5 {
+2026-06-07T21:15:24.662942284Z   errno: -3008,
+2026-06-07T21:15:24.662946164Z   code: 'ENOTFOUND',
+2026-06-07T21:15:24.662950804Z   syscall: 'getaddrinfo',
+2026-06-07T21:15:24.662954575Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:15:24.662957704Z }
+2026-06-07T21:15:24.764645696Z 9:15:24 PM [express] serving on port 10000
+2026-06-07T21:15:44.573260693Z Email transporter configuration error: Error: Connection timeout
+2026-06-07T21:15:44.573351375Z     at SMTPConnection._formatError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:809:19)
+2026-06-07T21:15:44.573357555Z     at SMTPConnection._onError (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:795:20)
+2026-06-07T21:15:44.573362635Z     at Timeout.<anonymous> (/opt/render/project/src/node_modules/nodemailer/lib/smtp-connection/index.js:237:22)
+2026-06-07T21:15:44.573367125Z     at listOnTimeout (node:internal/timers:588:17)
+2026-06-07T21:15:44.573371216Z     at process.processTimers (node:internal/timers:523:7) {
+2026-06-07T21:15:44.573375705Z   code: 'ETIMEDOUT',
+2026-06-07T21:15:44.573379816Z   command: 'CONN'
+2026-06-07T21:15:44.573383776Z }
+2026-06-07T21:15:44.573403976Z Please ensure GMAIL_APP_PASSWORD environment variable is set correctly.
+2026-06-07T21:16:09.568375624Z /opt/render/project/src/node_modules/pg-pool/index.js:45
+2026-06-07T21:16:09.568414305Z     Error.captureStackTrace(err)
+2026-06-07T21:16:09.568420805Z           ^
+2026-06-07T21:16:09.568426265Z 
+2026-06-07T21:16:09.568431916Z Error: getaddrinfo ENOTFOUND dpg-d7l7li1f9bms738e27u0-a
+2026-06-07T21:16:09.568438216Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2026-06-07T21:16:09.568445206Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-06-07T21:16:09.568452236Z     at async file:///opt/render/project/src/node_modules/drizzle-orm/node-postgres/session.js:83:22
+2026-06-07T21:16:09.568458206Z     at async DatabaseStorage.getUserByEmail (file:///opt/render/project/src/dist/index.js:227:24)
+2026-06-07T21:16:09.568462886Z     at async file:///opt/render/project/src/dist/index.js:865:22 {
+2026-06-07T21:16:09.568466896Z   errno: -3008,
+2026-06-07T21:16:09.568471606Z   code: 'ENOTFOUND',
+2026-06-07T21:16:09.568475837Z   syscall: 'getaddrinfo',
+2026-06-07T21:16:09.568482017Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:16:09.568486677Z }
+2026-06-07T21:16:09.568491227Z 
+2026-06-07T21:16:09.568495987Z Node.js v22.16.0
+2026-06-07T21:16:28.391407023Z ==> Running 'npm run start'
+2026-06-07T21:16:29.398026881Z 
+2026-06-07T21:16:29.398061932Z > rest-express@1.0.0 start
+2026-06-07T21:16:29.398068632Z > NODE_ENV=production node dist/index.js
+2026-06-07T21:16:29.398071722Z 
+2026-06-07T21:16:37.088223518Z Failed to ensure database schema: Error: getaddrinfo ENOTFOUND dpg-d7l7li1f9bms738e27u0-a
+2026-06-07T21:16:37.08827789Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2026-06-07T21:16:37.08828309Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-06-07T21:16:37.08828713Z     at async ensureSchema (file:///opt/render/project/src/dist/index.js:182:3)
+2026-06-07T21:16:37.0882913Z     at async file:///opt/render/project/src/dist/index.js:1324:5 {
+2026-06-07T21:16:37.08829528Z   errno: -3008,
+2026-06-07T21:16:37.088311311Z   code: 'ENOTFOUND',
+2026-06-07T21:16:37.088315971Z   syscall: 'getaddrinfo',
+2026-06-07T21:16:37.088320951Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:16:37.088324991Z }
+2026-06-07T21:16:37.194506542Z 9:16:37 PM [express] serving on port 10000

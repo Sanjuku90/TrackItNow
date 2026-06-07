@@ -107,6 +107,19 @@ app.use((req, res, next) => {
     }
   }, 1000 * 60 * 60 * 4); // Every 4 hours
 
+  // Self-ping toutes les 5 minutes pour éviter la mise en veille
+  const appUrl = process.env.REPLIT_DEV_DOMAIN
+    ? `https://${process.env.REPLIT_DEV_DOMAIN}`
+    : `http://localhost:${process.env.PORT || 5000}`;
+  setInterval(async () => {
+    try {
+      await fetch(`${appUrl}/api/health`);
+      log("Self-ping OK");
+    } catch (e) {
+      // silencieux en cas d'erreur réseau temporaire
+    }
+  }, 1000 * 60 * 5); // Every 5 minutes
+
   // Hourly job: expire premium operations whose expiry has passed
   setInterval(async () => {
     try {

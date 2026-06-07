@@ -49,6 +49,3 @@ stack = "FULLSTACK_JS"
 [userenv]
 
 [userenv.shared]
-EMAIL_USER = "trackitnoww@gmail.com"
-EMAIL_PASSWORD = "rhlz xgeg chxh yoic"
-ADMIN_EMAIL = "trackitnoww@gmail.com"

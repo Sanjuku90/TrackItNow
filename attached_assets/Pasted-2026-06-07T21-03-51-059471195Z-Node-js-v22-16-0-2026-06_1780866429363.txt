@@ -1,0 +1,50 @@
+2026-06-07T21:03:51.059471195Z Node.js v22.16.0
+2026-06-07T21:04:19.021007081Z ==> Running 'npm run start'
+2026-06-07T21:04:20.013245335Z 
+2026-06-07T21:04:20.013275826Z > rest-express@1.0.0 start
+2026-06-07T21:04:20.013281696Z > NODE_ENV=production node dist/index.js
+2026-06-07T21:04:20.013284207Z 
+2026-06-07T21:04:27.322049702Z Failed to ensure database schema: Error: getaddrinfo ENOTFOUND dpg-d7l7li1f9bms738e27u0-a
+2026-06-07T21:04:27.322077853Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2026-06-07T21:04:27.322082613Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-06-07T21:04:27.322086853Z     at async ensureSchema (file:///opt/render/project/src/dist/index.js:182:3)
+2026-06-07T21:04:27.322091313Z     at async file:///opt/render/project/src/dist/index.js:1324:5 {
+2026-06-07T21:04:27.322096023Z   errno: -3008,
+2026-06-07T21:04:27.322101363Z   code: 'ENOTFOUND',
+2026-06-07T21:04:27.322106383Z   syscall: 'getaddrinfo',
+2026-06-07T21:04:27.322111693Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:04:27.322116383Z }
+2026-06-07T21:04:27.52020522Z 9:04:27 PM [express] serving on port 10000
+2026-06-07T21:04:46.431722374Z /opt/render/project/src/node_modules/pg-pool/index.js:45
+2026-06-07T21:04:46.431747465Z     Error.captureStackTrace(err)
+2026-06-07T21:04:46.431752795Z           ^
+2026-06-07T21:04:46.431757695Z 
+2026-06-07T21:04:46.431762516Z Error: getaddrinfo ENOTFOUND dpg-d7l7li1f9bms738e27u0-a
+2026-06-07T21:04:46.431767346Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2026-06-07T21:04:46.431772506Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-06-07T21:04:46.431777376Z     at async file:///opt/render/project/src/node_modules/drizzle-orm/node-postgres/session.js:83:22
+2026-06-07T21:04:46.431782166Z     at async DatabaseStorage.getUserByEmail (file:///opt/render/project/src/dist/index.js:227:24)
+2026-06-07T21:04:46.431786906Z     at async file:///opt/render/project/src/dist/index.js:873:18 {
+2026-06-07T21:04:46.431791796Z   errno: -3008,
+2026-06-07T21:04:46.431797366Z   code: 'ENOTFOUND',
+2026-06-07T21:04:46.431801657Z   syscall: 'getaddrinfo',
+2026-06-07T21:04:46.431806717Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:04:46.431811347Z }
+2026-06-07T21:04:46.434603605Z 
+2026-06-07T21:04:46.434620285Z Node.js v22.16.0
+2026-06-07T21:05:31.960184668Z ==> Running 'npm run start'
+2026-06-07T21:05:32.857125253Z 
+2026-06-07T21:05:32.857150844Z > rest-express@1.0.0 start
+2026-06-07T21:05:32.857155154Z > NODE_ENV=production node dist/index.js
+2026-06-07T21:05:32.857157134Z 
+2026-06-07T21:05:39.952094713Z Failed to ensure database schema: Error: getaddrinfo ENOTFOUND dpg-d7l7li1f9bms738e27u0-a
+2026-06-07T21:05:39.952128785Z     at /opt/render/project/src/node_modules/pg-pool/index.js:45:11
+2026-06-07T21:05:39.952132835Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-06-07T21:05:39.952136515Z     at async ensureSchema (file:///opt/render/project/src/dist/index.js:182:3)
+2026-06-07T21:05:39.952139885Z     at async file:///opt/render/project/src/dist/index.js:1324:5 {
+2026-06-07T21:05:39.952143065Z   errno: -3008,
+2026-06-07T21:05:39.952146735Z   code: 'ENOTFOUND',
+2026-06-07T21:05:39.952150705Z   syscall: 'getaddrinfo',
+2026-06-07T21:05:39.952155665Z   hostname: 'dpg-d7l7li1f9bms738e27u0-a'
+2026-06-07T21:05:39.952158675Z }
+2026-06-07T21:05:40.059158731Z 9:05:39 PM [express] serving on port 10000

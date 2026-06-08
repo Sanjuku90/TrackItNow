@@ -30,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, History, Filter, MapPin, X } from "lucide-react";
+import { Loader2, History, Filter, MapPin, X, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -109,6 +109,30 @@ export default function AdminDashboard() {
     },
     onError: (err: any) => {
       toast({ title: "Erreur", description: err.message ?? "Impossible d'effacer la localisation", variant: "destructive" });
+    },
+  });
+
+  const [sendingLocationId, setSendingLocationId] = useState<number | null>(null);
+  const sendLocation = useMutation({
+    mutationFn: async (purchase: Purchase) => {
+      const res = await apiRequest("POST", `/api/send-location`, {
+        userEmail: purchase.userEmail,
+        device: purchase.device,
+        purchaseId: purchase.id,
+      });
+      return res.json();
+    },
+    onMutate: (purchase) => setSendingLocationId(purchase.id),
+    onSuccess: (_, purchase) => {
+      setSendingLocationId(null);
+      toast({
+        title: "Email envoyé",
+        description: `Localisation envoyée à ${purchase.userEmail}`,
+      });
+    },
+    onError: (err: any) => {
+      setSendingLocationId(null);
+      toast({ title: "Erreur", description: err.message ?? "Envoi échoué", variant: "destructive" });
     },
   });
 
@@ -243,6 +267,18 @@ export default function AdminDashboard() {
                             → {STATUS_LABEL[to]}
                           </Button>
                         ))}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Envoyer la localisation par email"
+                          disabled={sendingLocationId === purchase.id}
+                          onClick={() => sendLocation.mutate(purchase)}
+                          data-testid={`button-send-location-${purchase.id}`}
+                        >
+                          {sendingLocationId === purchase.id
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : <Send className="h-4 w-4" />}
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"

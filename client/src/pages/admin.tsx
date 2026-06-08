@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Purchase, OperationLog, PURCHASE_STATUS_TRANSITIONS } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -59,10 +59,30 @@ export default function AdminDashboard() {
   const [locationTarget, setLocationTarget] = useState<Purchase | null>(null);
   const [presetLat, setPresetLat] = useState("");
   const [presetLng, setPresetLng] = useState("");
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [prevCount, setPrevCount] = useState<number | null>(null);
 
-  const { data: purchases, isLoading } = useQuery<Purchase[]>({
+  const { data: purchases, isLoading, dataUpdatedAt } = useQuery<Purchase[]>({
     queryKey: ["/api/operations"],
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
   });
+
+  useEffect(() => {
+    if (dataUpdatedAt) setLastUpdated(new Date(dataUpdatedAt));
+  }, [dataUpdatedAt]);
+
+  useEffect(() => {
+    if (!purchases) return;
+    const count = purchases.length;
+    if (prevCount !== null && count > prevCount) {
+      toast({
+        title: "Nouvelle opération",
+        description: `${count - prevCount} nouvelle(s) opération(s) reçue(s)`,
+      });
+    }
+    setPrevCount(count);
+  }, [purchases?.length]);
 
   const transition = useMutation({
     mutationFn: async ({ id, status, reason }: { id: number; status: string; reason?: string }) => {
@@ -167,8 +187,22 @@ export default function AdminDashboard() {
     <div className="container mx-auto py-10 px-4">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Administration des opérations</h1>
-          <p className="text-sm text-muted-foreground mt-1">{pendingCount} opération(s) en attente de validation</p>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold">Administration des opérations</h1>
+            <span className="flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 border border-green-200 rounded-full px-2.5 py-0.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+              </span>
+              EN DIRECT
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground mt-1">
+            {pendingCount} opération(s) en attente
+            {lastUpdated && (
+              <span className="ml-2 text-xs">· Mis à jour {lastUpdated.toLocaleTimeString("fr-FR")}</span>
+            )}
+          </p>
         </div>
         <div className="flex gap-2 items-center">
           <Filter className="w-4 h-4 text-muted-foreground" />

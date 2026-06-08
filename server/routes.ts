@@ -41,7 +41,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { email, password } = req.body;
     const existing = await storage.getUserByEmail(email);
     if (existing) return res.status(400).json({ error: "Email already registered" });
-    const user = await storage.createUser({ email, password, isAdmin: false });
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "trackitnoww@gmail.com";
+    const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+    const user = await storage.createUser({ email, password, isAdmin });
     (req as SessionRequest).session.userId = user.id;
     res.json(user);
   });

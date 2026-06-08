@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -29,7 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, History, Filter } from "lucide-react";
+import { Loader2, History, Filter, MapPin, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -55,6 +56,10 @@ export default function AdminDashboard() {
   const [reason, setReason] = useState("");
   const [logsForId, setLogsForId] = useState<number | null>(null);
 
+  const [locationTarget, setLocationTarget] = useState<Purchase | null>(null);
+  const [presetLat, setPresetLat] = useState("");
+  const [presetLng, setPresetLng] = useState("");
+
   const { data: purchases, isLoading } = useQuery<Purchase[]>({
     queryKey: ["/api/operations"],
   });
@@ -73,6 +78,37 @@ export default function AdminDashboard() {
     },
     onError: (err: any) => {
       toast({ title: "Erreur", description: err.message ?? "Transition refusée", variant: "destructive" });
+    },
+  });
+
+  const setLocation = useMutation({
+    mutationFn: async ({ id, lat, lng }: { id: number; lat: string; lng: string }) => {
+      const res = await apiRequest("PATCH", `/api/admin/purchases/${id}/preset-location`, { lat, lng });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/operations"] });
+      toast({ title: "Localisation définie", description: "La localisation prédéfinie a été enregistrée." });
+      setLocationTarget(null);
+      setPresetLat("");
+      setPresetLng("");
+    },
+    onError: (err: any) => {
+      toast({ title: "Erreur", description: err.message ?? "Impossible de définir la localisation", variant: "destructive" });
+    },
+  });
+
+  const clearLocation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/admin/purchases/${id}/preset-location`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/operations"] });
+      toast({ title: "Localisation effacée", description: "La localisation prédéfinie a été supprimée." });
+    },
+    onError: (err: any) => {
+      toast({ title: "Erreur", description: err.message ?? "Impossible d'effacer la localisation", variant: "destructive" });
     },
   });
 
@@ -95,6 +131,12 @@ export default function AdminDashboard() {
   function openTransition(p: Purchase, to: string) {
     setPendingTransition({ id: p.id, from: p.status, to });
     setReason("");
+  }
+
+  function openLocationDialog(p: Purchase) {
+    setLocationTarget(p);
+    setPresetLat(p.presetLat ?? "");
+    setPresetLng(p.presetLng ?? "");
   }
 
   return (
@@ -147,12 +189,14 @@ export default function AdminDashboard() {
                 <TableHead>Type</TableHead>
                 <TableHead>Montant</TableHead>
                 <TableHead>Statut</TableHead>
+                <TableHead>Localisation</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map((purchase) => {
                 const allowed = PURCHASE_STATUS_TRANSITIONS[purchase.status] ?? [];
+                const hasPreset = !!(purchase.presetLat && purchase.presetLng);
                 return (
                   <TableRow key={purchase.id} data-testid={`row-operation-${purchase.id}`}>
                     <TableCell>{purchase.userEmail}</TableCell>
@@ -163,6 +207,28 @@ export default function AdminDashboard() {
                     </TableCell>
                     <TableCell>${(purchase.amount / 100).toFixed(2)}</TableCell>
                     <TableCell><StatusBadge status={purchase.status} /></TableCell>
+                    <TableCell>
+                      {hasPreset ? (
+                        <div className="flex items-center gap-1">
+                          <Badge variant="secondary" className="text-xs font-mono gap-1 flex items-center">
+                            <MapPin className="h-3 w-3 text-green-500" />
+                            {parseFloat(purchase.presetLat!).toFixed(4)}, {parseFloat(purchase.presetLng!).toFixed(4)}
+                          </Badge>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-6 w-6"
+                            title="Effacer la localisation prédéfinie"
+                            disabled={clearLocation.isPending}
+                            onClick={() => clearLocation.mutate(purchase.id)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Aléatoire (Lomé)</span>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-2 flex-wrap">
                         {allowed.map(to => (
@@ -180,6 +246,15 @@ export default function AdminDashboard() {
                         <Button
                           size="sm"
                           variant="ghost"
+                          title="Définir une localisation"
+                          onClick={() => openLocationDialog(purchase)}
+                          data-testid={`button-location-${purchase.id}`}
+                        >
+                          <MapPin className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
                           onClick={() => setLogsForId(purchase.id)}
                           data-testid={`button-logs-${purchase.id}`}
                         >
@@ -192,7 +267,7 @@ export default function AdminDashboard() {
               })}
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                  <TableCell colSpan={8} className="text-center py-4 text-muted-foreground">
                     Aucune opération
                   </TableCell>
                 </TableRow>
@@ -201,6 +276,84 @@ export default function AdminDashboard() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Preset location dialog */}
+      <Dialog open={locationTarget !== null} onOpenChange={(o) => !o && setLocationTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Définir une localisation prédéfinie
+            </DialogTitle>
+            <DialogDescription>
+              Choisissez les coordonnées GPS qui seront envoyées au client{" "}
+              <strong>{locationTarget?.userEmail}</strong> lors du prochain envoi de localisation.
+              Laissez vide pour utiliser une position aléatoire à Lomé.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="preset-lat">Latitude</Label>
+                <Input
+                  id="preset-lat"
+                  placeholder="ex: 6.1311"
+                  value={presetLat}
+                  onChange={(e) => setPresetLat(e.target.value)}
+                  type="number"
+                  step="any"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="preset-lng">Longitude</Label>
+                <Input
+                  id="preset-lng"
+                  placeholder="ex: 1.2228"
+                  value={presetLng}
+                  onChange={(e) => setPresetLng(e.target.value)}
+                  type="number"
+                  step="any"
+                />
+              </div>
+            </div>
+
+            {presetLat && presetLng && (
+              <a
+                href={`https://www.google.com/maps?q=${presetLat},${presetLng}&z=15`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-500 hover:underline flex items-center gap-1"
+              >
+                <MapPin className="h-3 w-3" />
+                Vérifier sur Google Maps
+              </a>
+            )}
+
+            <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
+              <p className="font-medium mb-1">Coordonnées Lomé (exemples) :</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                <span>Blvd du 13 Janvier</span><span className="font-mono">6.1311, 1.2228</span>
+                <span>Av. de la Libération</span><span className="font-mono">6.1256, 1.2154</span>
+                <span>Route d'Aného</span><span className="font-mono">6.1458, 1.2345</span>
+                <span>Route de l'Aéroport</span><span className="font-mono">6.1845, 1.2156</span>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setLocationTarget(null)}>
+              Annuler
+            </Button>
+            <Button
+              disabled={setLocation.isPending || !presetLat || !presetLng}
+              onClick={() => locationTarget && setLocation.mutate({ id: locationTarget.id, lat: presetLat, lng: presetLng })}
+            >
+              {setLocation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Enregistrer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Transition confirm dialog with reason */}
       <Dialog open={pendingTransition !== null} onOpenChange={(o) => !o && setPendingTransition(null)}>

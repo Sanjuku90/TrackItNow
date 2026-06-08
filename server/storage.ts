@@ -28,6 +28,8 @@ export interface IStorage {
   ): Promise<Purchase>;
   expireDuePurchases(): Promise<number>;
   updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined>;
+  setPresetLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined>;
+  clearPresetLocation(id: number): Promise<Purchase | undefined>;
   updateUserPremium(email: string, expiry: string): Promise<User | undefined>;
 
   // Operation log methods
@@ -181,6 +183,22 @@ export class DatabaseStorage implements IStorage {
   async updatePurchaseLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined> {
     const [purchase] = await this.db.update(purchases)
       .set({ lastLat: lat, lastLng: lng })
+      .where(eq(purchases.id, id))
+      .returning();
+    return purchase;
+  }
+
+  async setPresetLocation(id: number, lat: string, lng: string): Promise<Purchase | undefined> {
+    const [purchase] = await this.db.update(purchases)
+      .set({ presetLat: lat, presetLng: lng })
+      .where(eq(purchases.id, id))
+      .returning();
+    return purchase;
+  }
+
+  async clearPresetLocation(id: number): Promise<Purchase | undefined> {
+    const [purchase] = await this.db.update(purchases)
+      .set({ presetLat: null, presetLng: null })
       .where(eq(purchases.id, id))
       .returning();
     return purchase;

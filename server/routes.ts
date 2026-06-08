@@ -296,6 +296,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const recipientEmail = (req as any).user?.email || email;
         
         if (latest) {
+          // Use preset location if configured for this purchase
+          if (latest.presetLat && latest.presetLng) {
+            coordinates = [parseFloat(latest.presetLat), parseFloat(latest.presetLng)];
+          }
           await storage.updatePurchaseLocation(latest.id, coordinates[0].toString(), coordinates[1].toString());
           console.log(`Sending location email to ${recipientEmail} for purchase ${latest.id}`);
           await sendLocationToUser(recipientEmail, device, coordinates);
@@ -348,6 +352,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin: set preset location for a purchase
+  app.patch('/api/admin/purchases/:id/preset-location', requireAdmin, async (req, res) => {
+    const id = parseInt(req.params.id);
+    const { lat, lng } = req.body;
+    if (!lat || !lng) return res.status(400).json({ error: 'lat and lng are required' });
+    const updated = await storage.setPresetLocation(id, String(lat), String(lng));
+    if (!updated) return res.status(404).json({ error: 'Purchase not found' });
+    res.json(updated);
+  });
+
+  // Admin: clear preset location for a purchase
+  app.delete('/api/admin/purchases/:id/preset-location', requireAdmin, async (req, res) => {
+    const id = parseInt(req.params.id);
+    const updated = await storage.clearPresetLocation(id);
+    if (!updated) return res.status(404).json({ error: 'Purchase not found' });
+    res.json(updated);
+  });
+
   // Send location to user
   app.post('/api/send-location', async (req, res) => {
     try {
@@ -357,8 +379,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
-      // Generate random location in Lomé
-      const coordinates = generateLomeLocation();
+      // Use preset location if configured, otherwise generate a random Lomé location
+      let coordinates: [number, number];
+      if (purchaseId) {
+        const purchase = await storage.getPurchase(purchaseId);
+        if (purchase?.presetLat && purchase?.presetLng) {
+          coordinates = [parseFloat(purchase.presetLat), parseFloat(purchase.presetLng)];
+        } else {
+          coordinates = generateLomeLocation();
+        }
+      } else {
+        coordinates = generateLomeLocation();
+      }
       
       // Save to history if purchaseId is provided
       if (purchaseId) {
@@ -368,6 +400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lng: coordinates[1].toString(),
           timestamp: new Date().toISOString()
         });
+        await storage.updatePurchaseLocation(purchaseId, coordinates[0].toString(), coordinates[1].toString());
       }
 
       const emailSent = await sendLocationToUser(userEmail, device, coordinates);

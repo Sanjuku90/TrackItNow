@@ -22,6 +22,8 @@ export const purchases = pgTable("purchases", {
   lastTrackingUpdate: text("last_tracking_update"),
   lastLat: text("last_lat"),
   lastLng: text("last_lng"),
+  presetLat: text("preset_lat"),
+  presetLng: text("preset_lng"),
   premiumExpiry: text("premium_expiry"),
   createdAt: text("created_at").notNull().default("1970-01-01T00:00:00.000Z"),
 });
